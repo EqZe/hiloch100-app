@@ -10,14 +10,13 @@ import {
   I18nManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import * as SecureStore from 'expo-secure-store';
 import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
+import CustomDatePicker from '@/components/CustomDatePicker';
 
 const STORAGE_KEY = 'start_date';
 
-// Ensure RTL is enabled
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
@@ -34,6 +33,7 @@ export default function CounterScreen() {
     stage2Total: number;
     currentStage: 1 | 2 | 'completed';
     showNotification: boolean;
+    isToday: boolean;
   } | null>(null);
 
   console.log('CounterScreen (iOS): Component rendered');
@@ -71,7 +71,43 @@ export default function CounterScreen() {
   };
 
   const calculateDates = (start: Date) => {
-    // Add 1 day to the start date as requested
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const startDateNormalized = new Date(start);
+    startDateNormalized.setHours(0, 0, 0, 0);
+    
+    const isToday = startDateNormalized.getTime() === today.getTime();
+    
+    if (isToday) {
+      console.log('Selected date is today - setting stages to 0%');
+      const actualStartDate = new Date(start);
+      actualStartDate.setDate(actualStartDate.getDate() + 1);
+
+      const threeMonthsDate = new Date(actualStartDate);
+      threeMonthsDate.setMonth(threeMonthsDate.getMonth() + 3);
+
+      const sixMonthsDate = new Date(actualStartDate);
+      sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
+
+      const stage1TotalDays = Math.ceil((threeMonthsDate.getTime() - actualStartDate.getTime()) / (1000 * 3600 * 24));
+      const stage2TotalDays = Math.ceil((sixMonthsDate.getTime() - threeMonthsDate.getTime()) / (1000 * 3600 * 24));
+
+      setCalculatedDates({
+        threeMonths: threeMonthsDate,
+        sixMonths: sixMonthsDate,
+        daysRemaining: stage1TotalDays + stage2TotalDays,
+        stage1Remaining: stage1TotalDays,
+        stage2Remaining: stage2TotalDays,
+        stage1Total: stage1TotalDays,
+        stage2Total: stage2TotalDays,
+        currentStage: 1,
+        showNotification: false,
+        isToday: true,
+      });
+      return;
+    }
+
     const actualStartDate = new Date(start);
     actualStartDate.setDate(actualStartDate.getDate() + 1);
 
@@ -81,7 +117,6 @@ export default function CounterScreen() {
     const sixMonthsDate = new Date(actualStartDate);
     sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
 
-    const today = new Date();
     const timeDiff = sixMonthsDate.getTime() - today.getTime();
     const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
@@ -116,16 +151,14 @@ export default function CounterScreen() {
       stage2Total: stage2TotalDays,
       currentStage,
       showNotification,
+      isToday: false,
     });
   };
 
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowPicker(false);
-    if (selectedDate) {
-      console.log('User selected date:', selectedDate);
-      setStartDate(selectedDate);
-      saveStartDate(selectedDate);
-    }
+  const handleDateSelect = (date: Date) => {
+    console.log('User selected date:', date);
+    setStartDate(date);
+    saveStartDate(date);
   };
 
   const formatDate = (date: Date) => {
@@ -161,11 +194,11 @@ export default function CounterScreen() {
   const sixMonthsDisplay = calculatedDates ? formatDate(calculatedDates.sixMonths) : '-';
 
   const stage1Progress = calculatedDates && calculatedDates.stage1Total > 0
-    ? ((calculatedDates.stage1Total - calculatedDates.stage1Remaining) / calculatedDates.stage1Total) * 100
+    ? (calculatedDates.isToday ? 0 : ((calculatedDates.stage1Total - calculatedDates.stage1Remaining) / calculatedDates.stage1Total) * 100)
     : 0;
 
   const stage2Progress = calculatedDates && calculatedDates.stage2Total > 0
-    ? ((calculatedDates.stage2Total - calculatedDates.stage2Remaining) / calculatedDates.stage2Total) * 100
+    ? (calculatedDates.isToday ? 0 : ((calculatedDates.stage2Total - calculatedDates.stage2Remaining) / calculatedDates.stage2Total) * 100)
     : 0;
 
   return (
@@ -366,16 +399,13 @@ export default function CounterScreen() {
         )}
       </ScrollView>
 
-      {showPicker && (
-        <DateTimePicker
-          value={startDate || new Date()}
-          mode="date"
-          display="spinner"
-          onChange={handleDateChange}
-          maximumDate={new Date()}
-          locale="he-IL"
-        />
-      )}
+      <CustomDatePicker
+        visible={showPicker}
+        onClose={() => setShowPicker(false)}
+        onSelectDate={handleDateSelect}
+        selectedDate={startDate}
+        maximumDate={new Date()}
+      />
     </SafeAreaView>
   );
 }

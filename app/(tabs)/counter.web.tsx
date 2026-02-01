@@ -11,15 +11,16 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
+import CustomDatePicker from '@/components/CustomDatePicker';
 
 const STORAGE_KEY = 'start_date';
 
-// Ensure RTL is enabled
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
 export default function CounterScreen() {
   const [startDate, setStartDate] = useState<Date | null>(null);
+  const [showPicker, setShowPicker] = useState(false);
   const [calculatedDates, setCalculatedDates] = useState<{
     threeMonths: Date;
     sixMonths: Date;
@@ -30,6 +31,7 @@ export default function CounterScreen() {
     stage2Total: number;
     currentStage: 1 | 2 | 'completed';
     showNotification: boolean;
+    isToday: boolean;
   } | null>(null);
 
   console.log('CounterScreen (Web): Component rendered');
@@ -67,7 +69,43 @@ export default function CounterScreen() {
   };
 
   const calculateDates = (start: Date) => {
-    // Add 1 day to the start date as requested
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const startDateNormalized = new Date(start);
+    startDateNormalized.setHours(0, 0, 0, 0);
+    
+    const isToday = startDateNormalized.getTime() === today.getTime();
+    
+    if (isToday) {
+      console.log('Selected date is today - setting stages to 0%');
+      const actualStartDate = new Date(start);
+      actualStartDate.setDate(actualStartDate.getDate() + 1);
+
+      const threeMonthsDate = new Date(actualStartDate);
+      threeMonthsDate.setMonth(threeMonthsDate.getMonth() + 3);
+
+      const sixMonthsDate = new Date(actualStartDate);
+      sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
+
+      const stage1TotalDays = Math.ceil((threeMonthsDate.getTime() - actualStartDate.getTime()) / (1000 * 3600 * 24));
+      const stage2TotalDays = Math.ceil((sixMonthsDate.getTime() - threeMonthsDate.getTime()) / (1000 * 3600 * 24));
+
+      setCalculatedDates({
+        threeMonths: threeMonthsDate,
+        sixMonths: sixMonthsDate,
+        daysRemaining: stage1TotalDays + stage2TotalDays,
+        stage1Remaining: stage1TotalDays,
+        stage2Remaining: stage2TotalDays,
+        stage1Total: stage1TotalDays,
+        stage2Total: stage2TotalDays,
+        currentStage: 1,
+        showNotification: false,
+        isToday: true,
+      });
+      return;
+    }
+
     const actualStartDate = new Date(start);
     actualStartDate.setDate(actualStartDate.getDate() + 1);
 
@@ -77,7 +115,6 @@ export default function CounterScreen() {
     const sixMonthsDate = new Date(actualStartDate);
     sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
 
-    const today = new Date();
     const timeDiff = sixMonthsDate.getTime() - today.getTime();
     const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
@@ -112,17 +149,14 @@ export default function CounterScreen() {
       stage2Total: stage2TotalDays,
       currentStage,
       showNotification,
+      isToday: false,
     });
   };
 
-  const handleDateChange = (event: any) => {
-    const dateString = event.target.value;
-    if (dateString) {
-      const date = new Date(dateString);
-      console.log('User selected date:', date);
-      setStartDate(date);
-      saveStartDate(date);
-    }
+  const handleDateSelect = (date: Date) => {
+    console.log('User selected date:', date);
+    setStartDate(date);
+    saveStartDate(date);
   };
 
   const formatDate = (date: Date) => {
@@ -130,13 +164,6 @@ export default function CounterScreen() {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
-  };
-
-  const formatDateForInput = (date: Date) => {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
   };
 
   const handleClearDate = () => {
@@ -149,18 +176,16 @@ export default function CounterScreen() {
     }
   };
 
+  const startDateDisplay = startDate ? formatDate(startDate) : 'בחר תאריך';
   const threeMonthsDisplay = calculatedDates ? formatDate(calculatedDates.threeMonths) : '-';
   const sixMonthsDisplay = calculatedDates ? formatDate(calculatedDates.sixMonths) : '-';
 
-  const today = new Date();
-  const maxDate = formatDateForInput(today);
-
   const stage1Progress = calculatedDates && calculatedDates.stage1Total > 0
-    ? ((calculatedDates.stage1Total - calculatedDates.stage1Remaining) / calculatedDates.stage1Total) * 100
+    ? (calculatedDates.isToday ? 0 : ((calculatedDates.stage1Total - calculatedDates.stage1Remaining) / calculatedDates.stage1Total) * 100)
     : 0;
 
   const stage2Progress = calculatedDates && calculatedDates.stage2Total > 0
-    ? ((calculatedDates.stage2Total - calculatedDates.stage2Remaining) / calculatedDates.stage2Total) * 100
+    ? (calculatedDates.isToday ? 0 : ((calculatedDates.stage2Total - calculatedDates.stage2Remaining) / calculatedDates.stage2Total) * 100)
     : 0;
 
   return (
@@ -183,27 +208,21 @@ export default function CounterScreen() {
               color={colors.primary}
             />
           </View>
-          <View style={styles.dateInputContainer}>
-            <input
-              type="date"
-              value={startDate ? formatDateForInput(startDate) : ''}
-              onChange={handleDateChange}
-              max={maxDate}
-              style={{
-                width: '100%',
-                padding: 18,
-                fontSize: 20,
-                fontWeight: '600',
-                color: colors.text,
-                backgroundColor: colors.backgroundAlt,
-                border: 'none',
-                borderRadius: 14,
-                fontFamily: 'system-ui',
-                direction: 'rtl',
-                textAlign: 'right',
-              }}
+          <TouchableOpacity
+            style={styles.dateButton}
+            onPress={() => {
+              console.log('User tapped select date button');
+              setShowPicker(true);
+            }}
+          >
+            <IconSymbol
+              ios_icon_name="chevron.down"
+              android_material_icon_name="arrow-drop-down"
+              size={24}
+              color={colors.textSecondary}
             />
-          </View>
+            <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
+          </TouchableOpacity>
 
           {startDate && (
             <TouchableOpacity
@@ -366,6 +385,14 @@ export default function CounterScreen() {
           </View>
         )}
       </ScrollView>
+
+      <CustomDatePicker
+        visible={showPicker}
+        onClose={() => setShowPicker(false)}
+        onSelectDate={handleDateSelect}
+        selectedDate={startDate}
+        maximumDate={new Date()}
+      />
     </SafeAreaView>
   );
 }
@@ -413,8 +440,19 @@ const styles = StyleSheet.create({
     color: colors.text,
     textAlign: 'right',
   },
-  dateInputContainer: {
-    width: '100%',
+  dateButton: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.backgroundAlt,
+    padding: 18,
+    borderRadius: 14,
+  },
+  dateButtonText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.text,
+    textAlign: 'right',
   },
   clearButton: {
     flexDirection: 'row-reverse',

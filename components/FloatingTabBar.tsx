@@ -117,22 +117,22 @@ export default function FloatingTabBar({
             ? 'rgba(28, 28, 30, 0.85)'
             : 'rgba(255, 255, 255, 0.85)',
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 12,
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.3,
+          shadowRadius: 16,
         },
         android: {
           backgroundColor: theme.dark
             ? 'rgba(28, 28, 30, 0.95)'
             : 'rgba(255, 255, 255, 0.95)',
-          elevation: 8,
+          elevation: 12,
         },
         web: {
           backgroundColor: theme.dark
             ? 'rgba(28, 28, 30, 0.95)'
             : 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(20px)',
-          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.25)',
         },
       }),
     },
@@ -175,9 +175,8 @@ export default function FloatingTabBar({
                   activeOpacity={0.6}
                 >
                   <View style={styles.tabContent}>
-                    <IconSymbol
-                      android_material_icon_name={tab.icon}
-                      ios_icon_name={tab.icon}
+                    <MaterialIcons
+                      name={tab.icon}
                       size={26}
                       color={isActive ? '#4FC3F7' : (theme.dark ? '#8E8E93' : '#8E8E93')}
                     />
