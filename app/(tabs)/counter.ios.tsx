@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  I18nManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -15,6 +16,10 @@ import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
 
 const STORAGE_KEY = 'start_date';
+
+// Ensure RTL is enabled
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
 
 export default function CounterScreen() {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -66,17 +71,21 @@ export default function CounterScreen() {
   };
 
   const calculateDates = (start: Date) => {
-    const threeMonthsDate = new Date(start);
+    // Add 1 day to the start date as requested
+    const actualStartDate = new Date(start);
+    actualStartDate.setDate(actualStartDate.getDate() + 1);
+
+    const threeMonthsDate = new Date(actualStartDate);
     threeMonthsDate.setMonth(threeMonthsDate.getMonth() + 3);
 
-    const sixMonthsDate = new Date(start);
+    const sixMonthsDate = new Date(actualStartDate);
     sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
 
     const today = new Date();
     const timeDiff = sixMonthsDate.getTime() - today.getTime();
     const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    const stage1TotalDays = Math.ceil((threeMonthsDate.getTime() - start.getTime()) / (1000 * 3600 * 24));
+    const stage1TotalDays = Math.ceil((threeMonthsDate.getTime() - actualStartDate.getTime()) / (1000 * 3600 * 24));
     const stage2TotalDays = Math.ceil((sixMonthsDate.getTime() - threeMonthsDate.getTime()) / (1000 * 3600 * 24));
 
     let stage1Remaining = 0;
@@ -166,8 +175,7 @@ export default function CounterScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>ספירת ימים</Text>
-          <Text style={styles.subtitle}>תקופת מלווה - 6 חודשים</Text>
+          <Text style={styles.title}>ספירת ימי מלווה</Text>
         </View>
 
         <View style={styles.dateCard}>
@@ -178,7 +186,7 @@ export default function CounterScreen() {
               size={24}
               color={colors.primary}
             />
-            <Text style={styles.dateCardTitle}>תאריך התחלה</Text>
+            <Text style={styles.dateCardTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
           </View>
           <TouchableOpacity
             style={styles.dateButton}
@@ -235,22 +243,22 @@ export default function CounterScreen() {
                 </View>
 
                 <View style={styles.progressContainer}>
-                  <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: `${stage1Progress}%` }]} />
-                  </View>
                   <Text style={styles.progressText}>
                     {Math.round(stage1Progress)}%
                   </Text>
+                  <View style={styles.progressBar}>
+                    <View style={[styles.progressFill, { width: `${stage1Progress}%` }]} />
+                  </View>
                 </View>
 
                 <View style={styles.stageDetails}>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>ימים שנותרו</Text>
                     <Text style={styles.detailValue}>{calculatedDates.stage1Remaining}</Text>
+                    <Text style={styles.detailLabel}>ימים שנותרו</Text>
                   </View>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>תאריך סיום</Text>
                     <Text style={styles.detailValue}>{threeMonthsDisplay}</Text>
+                    <Text style={styles.detailLabel}>תאריך סיום</Text>
                   </View>
                 </View>
 
@@ -281,22 +289,22 @@ export default function CounterScreen() {
                 </View>
 
                 <View style={styles.progressContainer}>
-                  <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: `${stage2Progress}%` }]} />
-                  </View>
                   <Text style={styles.progressText}>
                     {Math.round(stage2Progress)}%
                   </Text>
+                  <View style={styles.progressBar}>
+                    <View style={[styles.progressFill, { width: `${stage2Progress}%` }]} />
+                  </View>
                 </View>
 
                 <View style={styles.stageDetails}>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>ימים שנותרו</Text>
                     <Text style={styles.detailValue}>{calculatedDates.stage2Remaining}</Text>
+                    <Text style={styles.detailLabel}>ימים שנותרו</Text>
                   </View>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>תאריך סיום</Text>
                     <Text style={styles.detailValue}>{sixMonthsDisplay}</Text>
+                    <Text style={styles.detailLabel}>תאריך סיום</Text>
                   </View>
                 </View>
 
@@ -352,7 +360,7 @@ export default function CounterScreen() {
             />
             <Text style={styles.emptyTitle}>בחר תאריך התחלה</Text>
             <Text style={styles.emptyText}>
-              בחר את תאריך תחילת תקופת המלווה כדי לראות את החישוב המפורט
+              בחר את תאריך תשלום אגרת היתר נהיגה כדי לראות את החישוב המפורט
             </Text>
           </View>
         )}
@@ -392,13 +400,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: colors.text,
     textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginTop: 6,
-    textAlign: 'center',
-    fontWeight: '500',
   },
   dateCard: {
     backgroundColor: colors.card,
@@ -523,7 +524,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
     minWidth: 45,
-    textAlign: 'right',
+    textAlign: 'left',
   },
   stageDetails: {
     gap: 10,
@@ -549,7 +550,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 12,
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
   },
   currentBadgeText: {
     fontSize: 13,

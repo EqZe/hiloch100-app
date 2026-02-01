@@ -1,3 +1,4 @@
+
 import "react-native-reanimated";
 import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
@@ -5,7 +6,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SystemBars } from "react-native-edge-to-edge";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useColorScheme, Alert } from "react-native";
+import { useColorScheme, Alert, I18nManager } from "react-native";
 import { useNetworkState } from "expo-network";
 import {
   DarkTheme,
@@ -19,6 +20,10 @@ import { WidgetProvider } from "@/contexts/WidgetContext";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+// Force RTL layout for Hebrew
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
 
 export const unstable_settings = {
   initialRouteName: "(tabs)", // Ensure any route can link back to `/`
