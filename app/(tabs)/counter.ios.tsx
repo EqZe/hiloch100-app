@@ -25,6 +25,7 @@ export default function CounterScreen() {
   const [showPicker, setShowPicker] = useState(false);
   const [stage1Expanded, setStage1Expanded] = useState(true);
   const [stage2Expanded, setStage2Expanded] = useState(true);
+  const [datePickerExpanded, setDatePickerExpanded] = useState(true);
   const [calculatedDates, setCalculatedDates] = useState<{
     threeMonths: Date;
     sixMonths: Date;
@@ -57,6 +58,7 @@ export default function CounterScreen() {
         const date = new Date(savedDate);
         console.log('Loaded saved date:', date);
         setStartDate(date);
+        setDatePickerExpanded(false);
       }
     } catch (error) {
       console.log('Error loading date:', error);
@@ -137,6 +139,10 @@ export default function CounterScreen() {
       stage1Remaining = 0;
       stage2Remaining = Math.ceil((sixMonthsDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
       currentStage = 2;
+      setStage1Expanded(false);
+    } else {
+      setStage1Expanded(false);
+      setStage2Expanded(false);
     }
 
     const showNotification = daysRemaining <= 30 && daysRemaining > 0;
@@ -161,6 +167,7 @@ export default function CounterScreen() {
     console.log('User selected date:', date);
     setStartDate(date);
     saveStartDate(date);
+    setDatePickerExpanded(false);
   };
 
   const formatDate = (date: Date) => {
@@ -184,6 +191,7 @@ export default function CounterScreen() {
             console.log('Clearing saved date');
             setStartDate(null);
             setCalculatedDates(null);
+            setDatePickerExpanded(true);
             await SecureStore.deleteItemAsync(STORAGE_KEY);
           },
         },
@@ -216,60 +224,110 @@ export default function CounterScreen() {
           <Text style={styles.title}>ספירת ימי מלווה</Text>
         </View>
 
-        <View style={styles.dateCard}>
-          <View style={styles.dateCardHeader}>
-            <Text style={styles.dateCardTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
-            <IconSymbol
-              ios_icon_name="calendar"
-              android_material_icon_name="calendar-today"
-              size={24}
-              color={colors.primary}
-            />
-          </View>
-          
-          <View style={styles.infoBox}>
-            <IconSymbol
-              ios_icon_name="info.circle.fill"
-              android_material_icon_name="info"
-              size={18}
-              color="#4FC3F7"
-            />
-            <Text style={styles.infoText}>
-              מדובר בתאריך בו שילמת את האגרה - לא בתאריך מעבר הטסט
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={styles.dateButton}
-            onPress={() => {
-              console.log('User tapped select date button');
-              setShowPicker(true);
-            }}
-          >
-            <IconSymbol
-              ios_icon_name="chevron.down"
-              android_material_icon_name="arrow-drop-down"
-              size={24}
-              color={colors.textSecondary}
-            />
-            <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
-          </TouchableOpacity>
-
-          {startDate && (
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={handleClearDate}
-            >
-              <Text style={styles.clearButtonText}>מחק תאריך</Text>
+        {datePickerExpanded ? (
+          <View style={styles.dateCard}>
+            <View style={styles.dateCardHeader}>
+              <Text style={styles.dateCardTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
               <IconSymbol
-                ios_icon_name="trash"
-                android_material_icon_name="delete"
-                size={16}
+                ios_icon_name="calendar"
+                android_material_icon_name="calendar-today"
+                size={24}
+                color={colors.primary}
+              />
+            </View>
+            
+            <View style={styles.infoBox}>
+              <IconSymbol
+                ios_icon_name="info.circle.fill"
+                android_material_icon_name="info"
+                size={18}
+                color="#4FC3F7"
+              />
+              <Text style={styles.infoText}>
+                מדובר בתאריך בו שילמת את האגרה - לא בתאריך מעבר הטסט
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={() => {
+                console.log('User tapped select date button');
+                setShowPicker(true);
+              }}
+            >
+              <IconSymbol
+                ios_icon_name="chevron.down"
+                android_material_icon_name="arrow-drop-down"
+                size={24}
                 color={colors.textSecondary}
               />
+              <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
             </TouchableOpacity>
-          )}
-        </View>
+
+            {startDate && (
+              <>
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={handleClearDate}
+                >
+                  <Text style={styles.clearButtonText}>מחק תאריך</Text>
+                  <IconSymbol
+                    ios_icon_name="trash"
+                    android_material_icon_name="delete"
+                    size={16}
+                    color={colors.textSecondary}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.collapseButton}
+                  onPress={() => {
+                    console.log('User tapped to collapse date picker');
+                    setDatePickerExpanded(false);
+                  }}
+                >
+                  <Text style={styles.collapseButtonText}>כווץ</Text>
+                  <IconSymbol
+                    ios_icon_name="chevron.up"
+                    android_material_icon_name="expand-less"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={styles.dateCardCollapsed}
+            onPress={() => {
+              console.log('User tapped to expand date picker');
+              setDatePickerExpanded(true);
+            }}
+          >
+            <View style={styles.collapsedContent}>
+              <View style={styles.collapsedLeft}>
+                <IconSymbol
+                  ios_icon_name="calendar"
+                  android_material_icon_name="calendar-today"
+                  size={28}
+                  color={colors.primary}
+                />
+              </View>
+              <View style={styles.collapsedCenter}>
+                <Text style={styles.collapsedTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
+                <Text style={styles.collapsedDateValue}>{startDateDisplay}</Text>
+              </View>
+              <View style={styles.collapsedRight}>
+                <IconSymbol
+                  ios_icon_name="chevron.down"
+                  android_material_icon_name="expand-more"
+                  size={24}
+                  color={colors.textSecondary}
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
 
         {calculatedDates && (
           <>
@@ -574,6 +632,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
   },
+  dateCardCollapsed: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#4FC3F7',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+  },
   dateCardHeader: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -699,6 +769,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#4CAF50',
+    textAlign: 'right',
+    marginTop: 2,
+  },
+  collapsedDateValue: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textSecondary,
     textAlign: 'right',
     marginTop: 2,
   },
