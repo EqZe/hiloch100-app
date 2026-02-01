@@ -180,13 +180,13 @@ export default function CounterScreen() {
 
         <View style={styles.dateCard}>
           <View style={styles.dateCardHeader}>
+            <Text style={styles.dateCardTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
             <IconSymbol
               ios_icon_name="calendar"
               android_material_icon_name="calendar-today"
               size={24}
               color={colors.primary}
             />
-            <Text style={styles.dateCardTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
           </View>
           <TouchableOpacity
             style={styles.dateButton}
@@ -195,13 +195,13 @@ export default function CounterScreen() {
               setShowPicker(true);
             }}
           >
-            <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
             <IconSymbol
               ios_icon_name="chevron.down"
               android_material_icon_name="arrow-drop-down"
               size={24}
               color={colors.textSecondary}
             />
+            <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
           </TouchableOpacity>
 
           {startDate && (
@@ -209,13 +209,13 @@ export default function CounterScreen() {
               style={styles.clearButton}
               onPress={handleClearDate}
             >
+              <Text style={styles.clearButtonText}>מחק תאריך</Text>
               <IconSymbol
                 ios_icon_name="trash"
                 android_material_icon_name="delete"
                 size={16}
                 color={colors.textSecondary}
               />
-              <Text style={styles.clearButtonText}>מחק תאריך</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -228,6 +228,10 @@ export default function CounterScreen() {
                 calculatedDates.currentStage === 1 && styles.stageCardActive
               ]}>
                 <View style={styles.stageHeader}>
+                  <View style={styles.stageTitleContainer}>
+                    <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
+                    <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
+                  </View>
                   <View style={styles.stageIconContainer}>
                     <IconSymbol
                       ios_icon_name="person.fill"
@@ -236,29 +240,25 @@ export default function CounterScreen() {
                       color={calculatedDates.currentStage === 1 ? '#4FC3F7' : '#8E8E93'}
                     />
                   </View>
-                  <View style={styles.stageTitleContainer}>
-                    <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
-                    <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
-                  </View>
                 </View>
 
                 <View style={styles.progressContainer}>
-                  <Text style={styles.progressText}>
-                    {Math.round(stage1Progress)}%
-                  </Text>
                   <View style={styles.progressBar}>
                     <View style={[styles.progressFill, { width: `${stage1Progress}%` }]} />
                   </View>
+                  <Text style={styles.progressText}>
+                    {Math.round(stage1Progress)}%
+                  </Text>
                 </View>
 
                 <View style={styles.stageDetails}>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailValue}>{calculatedDates.stage1Remaining}</Text>
                     <Text style={styles.detailLabel}>ימים שנותרו</Text>
+                    <Text style={styles.detailValue}>{calculatedDates.stage1Remaining}</Text>
                   </View>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailValue}>{threeMonthsDisplay}</Text>
                     <Text style={styles.detailLabel}>תאריך סיום</Text>
+                    <Text style={styles.detailValue}>{threeMonthsDisplay}</Text>
                   </View>
                 </View>
 
@@ -274,6 +274,10 @@ export default function CounterScreen() {
                 calculatedDates.currentStage === 2 && styles.stageCardActive
               ]}>
                 <View style={styles.stageHeader}>
+                  <View style={styles.stageTitleContainer}>
+                    <Text style={styles.stageTitle}>שלב 2 - מלווה לילה</Text>
+                    <Text style={styles.stageSubtitle}>3 חודשים נוספים</Text>
+                  </View>
                   <View style={styles.stageIconContainer}>
                     <IconSymbol
                       ios_icon_name="moon.fill"
@@ -282,29 +286,25 @@ export default function CounterScreen() {
                       color={calculatedDates.currentStage === 2 ? '#4FC3F7' : '#8E8E93'}
                     />
                   </View>
-                  <View style={styles.stageTitleContainer}>
-                    <Text style={styles.stageTitle}>שלב 2 - מלווה לילה</Text>
-                    <Text style={styles.stageSubtitle}>3 חודשים נוספים</Text>
-                  </View>
                 </View>
 
                 <View style={styles.progressContainer}>
-                  <Text style={styles.progressText}>
-                    {Math.round(stage2Progress)}%
-                  </Text>
                   <View style={styles.progressBar}>
                     <View style={[styles.progressFill, { width: `${stage2Progress}%` }]} />
                   </View>
+                  <Text style={styles.progressText}>
+                    {Math.round(stage2Progress)}%
+                  </Text>
                 </View>
 
                 <View style={styles.stageDetails}>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailValue}>{calculatedDates.stage2Remaining}</Text>
                     <Text style={styles.detailLabel}>ימים שנותרו</Text>
+                    <Text style={styles.detailValue}>{calculatedDates.stage2Remaining}</Text>
                   </View>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailValue}>{sixMonthsDisplay}</Text>
                     <Text style={styles.detailLabel}>תאריך סיום</Text>
+                    <Text style={styles.detailValue}>{sixMonthsDisplay}</Text>
                   </View>
                 </View>
 
@@ -319,13 +319,13 @@ export default function CounterScreen() {
             {calculatedDates.showNotification && (
               <View style={styles.notificationCard}>
                 <View style={styles.notificationHeader}>
+                  <Text style={styles.notificationTitle}>תזכורת חשובה</Text>
                   <IconSymbol
                     ios_icon_name="exclamationmark.triangle.fill"
                     android_material_icon_name="warning"
                     size={28}
                     color="#FF9800"
                   />
-                  <Text style={styles.notificationTitle}>תזכורת חשובה</Text>
                 </View>
                 <Text style={styles.notificationText}>
                   מומלץ לבצע הצהרת סיום מלווה בתנאי שבוצע בהתאם לחוק
@@ -373,6 +373,7 @@ export default function CounterScreen() {
           display="spinner"
           onChange={handleDateChange}
           maximumDate={new Date()}
+          locale="he-IL"
         />
       )}
     </SafeAreaView>
@@ -414,7 +415,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
   },
   dateCardHeader: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 10,
     marginBottom: 16,
@@ -423,9 +424,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,
+    textAlign: 'right',
   },
   dateButton: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.backgroundAlt,
@@ -436,9 +438,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: colors.text,
+    textAlign: 'right',
   },
   clearButton: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 14,
@@ -474,7 +477,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
   },
   stageHeader: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 14,
     marginBottom: 18,
@@ -489,20 +492,23 @@ const styles = StyleSheet.create({
   },
   stageTitleContainer: {
     flex: 1,
+    alignItems: 'flex-end',
   },
   stageTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: colors.text,
+    textAlign: 'right',
   },
   stageSubtitle: {
     fontSize: 14,
     color: colors.textSecondary,
     marginTop: 2,
     fontWeight: '500',
+    textAlign: 'right',
   },
   progressContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 12,
     marginBottom: 16,
@@ -524,13 +530,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
     minWidth: 45,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   stageDetails: {
     gap: 10,
   },
   detailRow: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
@@ -538,11 +544,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.textSecondary,
     fontWeight: '500',
+    textAlign: 'right',
   },
   detailValue: {
     fontSize: 17,
     fontWeight: '700',
     color: colors.text,
+    textAlign: 'right',
   },
   currentBadge: {
     marginTop: 14,
@@ -550,7 +558,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 12,
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-start',
   },
   currentBadgeText: {
     fontSize: 13,
@@ -566,7 +574,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   notificationHeader: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 12,
     marginBottom: 12,
@@ -575,12 +583,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,
+    textAlign: 'right',
   },
   notificationText: {
     fontSize: 15,
     color: colors.text,
     lineHeight: 22,
     fontWeight: '500',
+    textAlign: 'right',
   },
   completedCard: {
     backgroundColor: '#E8F5E9',

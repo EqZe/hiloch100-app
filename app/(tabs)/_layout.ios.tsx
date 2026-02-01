@@ -1,33 +1,36 @@
 
 import React from 'react';
-import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
 import { Stack } from 'expo-router';
+import FloatingTabBar, { TabBarItem } from '@/components/FloatingTabBar';
 
 export default function TabLayout() {
+  const tabs: TabBarItem[] = [
+    {
+      name: 'course',
+      route: '/(tabs)/course',
+      icon: 'school',
+      label: 'הכנה לטסט',
+    },
+    {
+      name: 'counter',
+      route: '/(tabs)/counter',
+      icon: 'calendar-today',
+      label: 'ספירת ימים',
+    },
+  ];
+
   return (
-    <NativeTabs>
-      <NativeTabs.Trigger key="course" name="course">
-        <Stack.Screen
-          name="course"
-          options={{
-            title: 'הכנה לטסט',
-            headerShown: false,
-          }}
-        />
-        <Icon sf="book.fill" drawable="school" />
-        <Label>הכנה לטסט</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger key="counter" name="counter">
-        <Stack.Screen
-          name="counter"
-          options={{
-            title: 'ספירת ימי מלווה',
-            headerShown: false,
-          }}
-        />
-        <Icon sf="calendar" drawable="calendar-today" />
-        <Label>ספירת ימים</Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'none',
+        }}
+      >
+        <Stack.Screen key="course" name="course" />
+        <Stack.Screen key="counter" name="counter" />
+      </Stack>
+      <FloatingTabBar tabs={tabs} />
+    </>
   );
 }
