@@ -2,6 +2,7 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import FloatingTabBar, { TabBarItem } from '@/components/FloatingTabBar';
+import { WebViewProvider } from '@/contexts/WebViewContext';
 
 export default function TabLayout() {
   const tabs: TabBarItem[] = [
@@ -20,7 +21,7 @@ export default function TabLayout() {
   ];
 
   return (
-    <>
+    <WebViewProvider>
       <Stack
         screenOptions={{
           headerShown: false,
@@ -31,6 +32,6 @@ export default function TabLayout() {
         <Stack.Screen key="counter" name="counter" />
       </Stack>
       <FloatingTabBar tabs={tabs} />
-    </>
+    </WebViewProvider>
   );
 }
