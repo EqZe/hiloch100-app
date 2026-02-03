@@ -25,11 +25,24 @@ export default function CircularProgress({
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const progressOffset = circumference - (progress / 100) * circumference;
+  
+  // Calculate the inner circle radius for the white background
+  const innerRadius = radius - strokeWidth / 2;
 
   const content = (
     <View style={[styles.container, { width: size, height: size }]}>
       <Svg width={size} height={size}>
+        <G>
+          {/* White background circle - behind everything */}
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={innerRadius}
+            fill="#FFFFFF"
+          />
+        </G>
         <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
+          {/* Background track */}
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -38,6 +51,7 @@ export default function CircularProgress({
             strokeWidth={strokeWidth}
             fill="none"
           />
+          {/* Progress arc */}
           <Circle
             cx={size / 2}
             cy={size / 2}

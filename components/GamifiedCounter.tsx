@@ -143,6 +143,9 @@ export default function GamifiedCounter({
 
   const circleSize = 280;
 
+  // Check if fully completed: 0 days left and both stages done
+  const isFullyCompleted = currentRemaining === 0 && stage1Remaining === 0 && stage2Remaining === 0;
+
   return (
     <View style={styles.container}>
       <View style={[styles.mainCircleContainer, { width: circleSize, height: circleSize }]}>
@@ -164,14 +167,22 @@ export default function GamifiedCounter({
             onPress={handleFlip}
           >
             <View style={styles.mainCircleContent}>
-              <View style={styles.whiteBackground}>
-                <Text style={styles.endDateText}>{endDate}</Text>
-                <Text style={styles.mainNumber}>{currentRemainingText}</Text>
-                <Text style={styles.mainLabel}>ימים נותרו</Text>
-                <View style={styles.stageIndicator}>
-                  <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+              {isFullyCompleted ? (
+                <View style={styles.completionContainer}>
+                  <Text style={styles.completionTitle}>סיימת מלווה!</Text>
+                  <Text style={styles.completionSubtitle}>תהנה עם הרישיון</Text>
+                  <Text style={styles.completionBrand}>מהילוך מאה</Text>
                 </View>
-              </View>
+              ) : (
+                <>
+                  <Text style={styles.endDateText}>{endDate}</Text>
+                  <Text style={styles.mainNumber}>{currentRemainingText}</Text>
+                  <Text style={styles.mainLabel}>ימים נותרו</Text>
+                  <View style={styles.stageIndicator}>
+                    <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+                  </View>
+                </>
+              )}
             </View>
           </CircularProgress>
         </Animated.View>
@@ -195,14 +206,22 @@ export default function GamifiedCounter({
             onPress={handleFlip}
           >
             <View style={styles.mainCircleContent}>
-              <View style={styles.whiteBackground}>
-                <Text style={styles.endDateText}>{endDate}</Text>
-                <Text style={styles.mainNumber}>{percentageText}</Text>
-                <Text style={styles.mainLabel}>הושלם</Text>
-                <View style={styles.stageIndicator}>
-                  <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+              {isFullyCompleted ? (
+                <View style={styles.completionContainer}>
+                  <Text style={styles.completionTitle}>סיימת מלווה!</Text>
+                  <Text style={styles.completionSubtitle}>תהנה עם הרישיון</Text>
+                  <Text style={styles.completionBrand}>מהילוך מאה</Text>
                 </View>
-              </View>
+              ) : (
+                <>
+                  <Text style={styles.endDateText}>{endDate}</Text>
+                  <Text style={styles.mainNumber}>{percentageText}</Text>
+                  <Text style={styles.mainLabel}>הושלם</Text>
+                  <View style={styles.stageIndicator}>
+                    <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+                  </View>
+                </>
+              )}
             </View>
           </CircularProgress>
         </Animated.View>
@@ -281,13 +300,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  whiteBackground: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 200,
-    padding: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   endDateText: {
     fontSize: 14,
     color: colors.textSecondary,
@@ -317,6 +329,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
+  },
+  completionContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  completionTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#4CAF50',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  completionSubtitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  completionBrand: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    textAlign: 'center',
   },
   nextStageNote: {
     fontSize: 16,
