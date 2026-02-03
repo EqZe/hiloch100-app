@@ -30,7 +30,7 @@ export default function GamifiedCounter({
   totalDaysCompleted,
   endDate,
 }: GamifiedCounterProps) {
-  console.log('GamifiedCounter: Rendering with stage', currentStage);
+  console.log('GamifiedCounter: Rendering with stage', currentStage, 'stage1Remaining:', stage1Remaining, 'stage2Remaining:', stage2Remaining);
 
   const rotation = useSharedValue(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -143,8 +143,10 @@ export default function GamifiedCounter({
 
   const circleSize = 280;
 
-  // Check if fully completed: 0 days left and both stages done
-  const isFullyCompleted = currentRemaining === 0 && stage1Remaining === 0 && stage2Remaining === 0;
+  // Check if fully completed: both stages done (0 remaining days)
+  const isFullyCompleted = stage1Remaining === 0 && stage2Remaining === 0 && currentStage === 'completed';
+  
+  console.log('GamifiedCounter: isFullyCompleted:', isFullyCompleted, 'currentStage:', currentStage);
 
   return (
     <View style={styles.container}>
