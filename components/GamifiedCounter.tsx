@@ -56,6 +56,8 @@ export default function GamifiedCounter({
   const currentRemaining = getCurrentStageRemaining();
   const currentProgressRounded = Math.round(currentProgress);
 
+  console.log('GamifiedCounter: currentRemaining =', currentRemaining, 'currentProgressRounded =', currentProgressRounded);
+
   const getCurrentStageTitle = () => {
     if (currentStage === 1) return 'מלווה 24/7';
     if (currentStage === 2) return 'מלווה לילה';
@@ -138,6 +140,14 @@ export default function GamifiedCounter({
   const hasNextStage = currentStage === 1 && stage2Remaining > 0;
   const nextStageText = 'השלב הבא: מלווה לילה';
 
+  // Extract all text values BEFORE JSX (Atomic JSX rule)
+  const daysRemainingText = String(currentRemaining);
+  const percentageText = `${currentProgressRounded}%`;
+  const daysLabel = 'ימים נותרו';
+  const completedLabel = 'הושלם';
+
+  console.log('GamifiedCounter: Displaying daysRemainingText =', daysRemainingText, 'percentageText =', percentageText);
+
   return (
     <View style={styles.container}>
       <View style={styles.mainCircleContainer}>
@@ -153,8 +163,8 @@ export default function GamifiedCounter({
             <Animated.View style={[styles.flipSide, frontAnimatedStyle]} pointerEvents="none">
               <View style={styles.mainCircleContent}>
                 <Text style={styles.endDateText}>{endDate}</Text>
-                <Text style={styles.mainNumber}>{currentRemaining}</Text>
-                <Text style={styles.mainLabel}>ימים נותרו</Text>
+                <Text style={styles.mainNumber}>{daysRemainingText}</Text>
+                <Text style={styles.mainLabel}>{daysLabel}</Text>
                 <View style={styles.stageIndicator}>
                   <Text style={styles.stageText}>{stageTitle}</Text>
                 </View>
@@ -164,8 +174,8 @@ export default function GamifiedCounter({
             <Animated.View style={[styles.flipSide, styles.flipSideBack, backAnimatedStyle]} pointerEvents="none">
               <View style={styles.mainCircleContent}>
                 <Text style={styles.endDateText}>{endDate}</Text>
-                <Text style={styles.mainNumber}>{currentProgressRounded}%</Text>
-                <Text style={styles.mainLabel}>הושלם</Text>
+                <Text style={styles.mainNumber}>{percentageText}</Text>
+                <Text style={styles.mainLabel}>{completedLabel}</Text>
                 <View style={styles.stageIndicator}>
                   <Text style={styles.stageText}>{stageTitle}</Text>
                 </View>
