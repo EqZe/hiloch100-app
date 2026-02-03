@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { colors } from '@/styles/commonStyles';
 import CircularProgress from '@/components/CircularProgress';
@@ -30,7 +30,7 @@ export default function GamifiedCounter({
   totalDaysCompleted,
   endDate,
 }: GamifiedCounterProps) {
-  console.log('GamifiedCounter: Rendering with stage', currentStage, 'stage1Remaining:', stage1Remaining, 'stage2Remaining:', stage2Remaining);
+  console.log('GamifiedCounter: Rendering with stage', currentStage);
 
   const rotation = useSharedValue(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -84,7 +84,7 @@ export default function GamifiedCounter({
     return 'כמעט שם! עוד קצת';
   };
 
-  const handleFlip = useCallback(() => {
+  const handleFlip = () => {
     console.log('GamifiedCounter: Flip button pressed');
     if (rotation.value === 0) {
       rotation.value = withTiming(180, { duration: 600 });
@@ -93,7 +93,7 @@ export default function GamifiedCounter({
       rotation.value = withTiming(0, { duration: 600 });
       setIsFlipped(false);
     }
-  }, [rotation]);
+  };
 
   const frontAnimatedStyle = useAnimatedStyle(() => {
     const rotateY = interpolate(
@@ -139,14 +139,9 @@ export default function GamifiedCounter({
   const nextStageNoteText = 'השלב הבא: מלווה לילה';
 
   const overallProgress = (totalDaysCompleted / (stage1Total + stage2Total)) * 100;
-  const overallProgressText = `${Math.round(overallProgress)}% מהליך הליווי הכולל הושלם`;
+  const overallProgressText = `${Math.round(overallProgress)}% מהמסלול הושלם`;
 
   const circleSize = 280;
-
-  // Check if fully completed: both stages done (0 remaining days)
-  const isFullyCompleted = stage1Remaining === 0 && stage2Remaining === 0 && currentStage === 'completed';
-  
-  console.log('GamifiedCounter: isFullyCompleted:', isFullyCompleted, 'currentStage:', currentStage);
 
   return (
     <View style={styles.container}>
@@ -169,22 +164,12 @@ export default function GamifiedCounter({
             onPress={handleFlip}
           >
             <View style={styles.mainCircleContent}>
-              {isFullyCompleted ? (
-                <View style={styles.completionContainer}>
-                  <Text style={styles.completionTitle}>סיימת מלווה!</Text>
-                  <Text style={styles.completionSubtitle}>תהנה עם הרישיון</Text>
-                  <Text style={styles.completionBrand}>מהילוך מאה</Text>
-                </View>
-              ) : (
-                <>
-                  <Text style={styles.endDateText}>{endDate}</Text>
-                  <Text style={styles.mainNumber}>{currentRemainingText}</Text>
-                  <Text style={styles.mainLabel}>ימים נותרו</Text>
-                  <View style={styles.stageIndicator}>
-                    <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
-                  </View>
-                </>
-              )}
+              <Text style={styles.endDateText}>{endDate}</Text>
+              <Text style={styles.mainNumber}>{currentRemainingText}</Text>
+              <Text style={styles.mainLabel}>ימים נותרו</Text>
+              <View style={styles.stageIndicator}>
+                <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+              </View>
             </View>
           </CircularProgress>
         </Animated.View>
@@ -208,22 +193,12 @@ export default function GamifiedCounter({
             onPress={handleFlip}
           >
             <View style={styles.mainCircleContent}>
-              {isFullyCompleted ? (
-                <View style={styles.completionContainer}>
-                  <Text style={styles.completionTitle}>סיימת מלווה!</Text>
-                  <Text style={styles.completionSubtitle}>תהנה עם הרישיון</Text>
-                  <Text style={styles.completionBrand}>מהילוך מאה</Text>
-                </View>
-              ) : (
-                <>
-                  <Text style={styles.endDateText}>{endDate}</Text>
-                  <Text style={styles.mainNumber}>{percentageText}</Text>
-                  <Text style={styles.mainLabel}>הושלם</Text>
-                  <View style={styles.stageIndicator}>
-                    <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
-                  </View>
-                </>
-              )}
+              <Text style={styles.endDateText}>{endDate}</Text>
+              <Text style={styles.mainNumber}>{percentageText}</Text>
+              <Text style={styles.mainLabel}>הושלם</Text>
+              <View style={styles.stageIndicator}>
+                <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+              </View>
             </View>
           </CircularProgress>
         </Animated.View>
@@ -332,31 +307,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
-  completionContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  completionTitle: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: '#4CAF50',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  completionSubtitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  completionBrand: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
   nextStageNote: {
     fontSize: 16,
     fontWeight: '600',
@@ -404,22 +354,6 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    fontWeight: '900',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#4FC3F7',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.8,
-        shadowRadius: 6,
-      },
-      android: {
-        elevation: 6,
-      },
-      web: {
-        boxShadow: '0px 3px 12px rgba(79, 195, 247, 0.8)',
-        fontWeight: 'bold',
-      },
-    }),
   },
   progressBarText: {
     fontSize: 14,
