@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import * as SecureStore from 'expo-secure-store';
 import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
 import CustomDatePicker from '@/components/CustomDatePicker';
+import GamifiedCounter from '@/components/GamifiedCounter';
 
 const STORAGE_KEY = 'start_date';
 
@@ -91,7 +92,7 @@ export default function CounterScreen() {
     }
   };
 
-  const calculateDates = (start: Date) => {
+  const calculateDates = useCallback((start: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -178,7 +179,7 @@ export default function CounterScreen() {
       showNotification,
       isToday: false,
     });
-  };
+  }, []);
 
   const handleDateSelect = (date: Date) => {
     console.log('User selected date:', date);
@@ -234,6 +235,23 @@ export default function CounterScreen() {
 
   const isStage1Completed = calculatedDates && calculatedDates.stage1Remaining === 0 && calculatedDates.currentStage !== 1;
   const isStage2Completed = calculatedDates && calculatedDates.stage2Remaining === 0 && calculatedDates.currentStage === 'completed';
+
+  const getTotalDaysCompleted = () => {
+    if (!calculatedDates) return 0;
+    const stage1Completed = calculatedDates.stage1Total - calculatedDates.stage1Remaining;
+    const stage2Completed = calculatedDates.stage2Total - calculatedDates.stage2Remaining;
+    return stage1Completed + stage2Completed;
+  };
+
+  const getCurrentEndDate = () => {
+    if (!calculatedDates) return '';
+    if (calculatedDates.currentStage === 1) {
+      return formatDate(calculatedDates.threeMonths);
+    } else if (calculatedDates.currentStage === 2) {
+      return formatDate(calculatedDates.sixMonths);
+    }
+    return formatDate(calculatedDates.sixMonths);
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -352,6 +370,16 @@ export default function CounterScreen() {
 
         {calculatedDates && (
           <>
+            <GamifiedCounter
+              currentStage={calculatedDates.currentStage}
+              stage1Remaining={calculatedDates.stage1Remaining}
+              stage2Remaining={calculatedDates.stage2Remaining}
+              stage1Total={calculatedDates.stage1Total}
+              stage2Total={calculatedDates.stage2Total}
+              totalDaysCompleted={getTotalDaysCompleted()}
+              endDate={getCurrentEndDate()}
+            />
+
             <View style={styles.stagesContainer}>
               {isStage1Completed && !stage1Expanded ? (
                 <TouchableOpacity
@@ -571,21 +599,6 @@ export default function CounterScreen() {
                 </View>
                 <Text style={styles.notificationText}>
                   מומלץ לבצע הצהרת סיום מלווה בתנאי שבוצע בהתאם לחוק
-                </Text>
-              </View>
-            )}
-
-            {calculatedDates.currentStage === 'completed' && (
-              <View style={styles.completedCard}>
-                <IconSymbol
-                  ios_icon_name="checkmark.circle.fill"
-                  android_material_icon_name="check-circle"
-                  size={48}
-                  color="#4CAF50"
-                />
-                <Text style={styles.completedTitle}>תקופת הליווי הסתיימה!</Text>
-                <Text style={styles.completedText}>
-                  סיימת בהצלחה את תקופת הליווי
                 </Text>
               </View>
             )}
@@ -1002,29 +1015,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontWeight: '500',
     textAlign: 'right',
-  },
-  completedCard: {
-    backgroundColor: '#E8F5E9',
-    borderRadius: 20,
-    padding: 28,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#4CAF50',
-  },
-  completedTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: colors.text,
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  completedText: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    marginTop: 8,
-    textAlign: 'center',
-    lineHeight: 22,
-    fontWeight: '500',
   },
   emptyState: {
     alignItems: 'center',
