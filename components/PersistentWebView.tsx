@@ -41,7 +41,7 @@ export default function PersistentWebView() {
         console.log('PersistentWebView: mobileapp parameter value:', mobileAppParam);
 
         if (mobileAppParam === 'denied') {
-          console.log('PersistentWebView: Access DENIED - mobileapp=denied detected');
+          console.log('PersistentWebView: Access DENIED - mobileapp=denied detected - BLOCKING ENTIRE APP INCLUDING NAVBAR');
           setShowAccessDenied(true);
           return; // Block further navigation/checks
         } else if (mobileAppParam === 'granted') {
@@ -118,7 +118,7 @@ export default function PersistentWebView() {
         </View>
       )}
 
-      {/* Access Denied Overlay - Persistent and Blocking */}
+      {/* Access Denied Overlay - Persistent and Blocking - Covers ENTIRE APP including navbar */}
       {showAccessDenied && (
         <View style={styles.accessDeniedOverlay}>
           <View style={styles.accessDeniedContent}>
@@ -184,17 +184,17 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
   },
-  // Access Denied Overlay Styles
+  // Access Denied Overlay Styles - FULL SCREEN BLOCKING
   accessDeniedOverlay: {
     position: 'absolute',
-    top: 0,
+    top: Platform.OS === 'android' ? -48 : 0, // Extend to cover Android top padding
     left: 0,
     right: 0,
     bottom: 0,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 9999,
+    zIndex: 99999, // Extremely high z-index to cover everything
   },
   accessDeniedContent: {
     alignItems: 'center',

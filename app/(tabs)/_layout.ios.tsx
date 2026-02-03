@@ -2,9 +2,11 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import FloatingTabBar, { TabBarItem } from '@/components/FloatingTabBar';
-import { WebViewProvider } from '@/contexts/WebViewContext';
+import { WebViewProvider, useWebView } from '@/contexts/WebViewContext';
 
-export default function TabLayout() {
+function TabLayoutContent() {
+  const { showAccessDenied } = useWebView();
+
   const tabs: TabBarItem[] = [
     {
       name: 'course',
@@ -20,8 +22,10 @@ export default function TabLayout() {
     },
   ];
 
+  console.log('TabLayout (iOS): showAccessDenied state:', showAccessDenied, '- Navbar will be', showAccessDenied ? 'HIDDEN' : 'VISIBLE');
+
   return (
-    <WebViewProvider>
+    <>
       <Stack
         screenOptions={{
           headerShown: false,
@@ -31,7 +35,16 @@ export default function TabLayout() {
         <Stack.Screen key="course" name="course" />
         <Stack.Screen key="counter" name="counter" />
       </Stack>
-      <FloatingTabBar tabs={tabs} />
+      {/* Only render FloatingTabBar when access is NOT denied */}
+      {!showAccessDenied && <FloatingTabBar tabs={tabs} />}
+    </>
+  );
+}
+
+export default function TabLayout() {
+  return (
+    <WebViewProvider>
+      <TabLayoutContent />
     </WebViewProvider>
   );
 }
