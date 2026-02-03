@@ -126,7 +126,7 @@ export default function PersistentWebView() {
           <View style={styles.accessDeniedContent}>
             {/* Block Image */}
             <Image
-              source={require('@/assets/images/f731a0e8-4ca3-4667-9c8e-d61146a0aff2.png')}
+              source={require('@/assets/images/9cf58ec3-19a5-40b4-b6ea-d8be6a6c628e.png')}
               style={styles.accessDeniedImage}
               resizeMode="contain"
             />
@@ -217,12 +217,12 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   accessDeniedBigTitle: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#DC2626',
     textAlign: 'center',
     marginBottom: 20,
-    lineHeight: 40,
+    lineHeight: 34,
     writingDirection: 'rtl',
   },
   accessDeniedSubtitle: {
