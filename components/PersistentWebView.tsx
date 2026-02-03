@@ -1,12 +1,11 @@
 
 import React, { useEffect, useCallback } from 'react';
-import { View, StyleSheet, Platform, Text, TouchableOpacity, Linking, I18nManager } from 'react-native';
+import { View, StyleSheet, Platform, Text, TouchableOpacity, Linking, I18nManager, Image } from 'react-native';
 import { WebView, WebViewNavigation } from 'react-native-webview';
 import { useWebView } from '@/contexts/WebViewContext';
 import { colors } from '@/styles/commonStyles';
 import LottieView from 'lottie-react-native';
 import { usePathname } from 'expo-router';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 // Enable RTL support for Hebrew
 I18nManager.allowRTL(true);
@@ -82,8 +81,9 @@ export default function PersistentWebView() {
     });
   }, []);
 
-  const titleText = 'אינך זכאי להשתמש באפליקציית המובייל של הילוך מאה';
-  const subtitleText = 'ניתן לפנות לצוות האתר לצורך שדרוג החבילה';
+  const bigTitleText = 'אופס... נכנסת באין כניסה!';
+  const subtitleText = 'אינך זכאי להשתמש באפליקציית המובייל של הילוך מאה';
+  const descriptionText = 'ניתן לפנות לצוות האתר לצורך שדרוג החבילה';
   const buttonText = 'צור קשר עם הצוות';
 
   return (
@@ -124,14 +124,21 @@ export default function PersistentWebView() {
       {showAccessDenied && (
         <View style={styles.accessDeniedOverlay}>
           <View style={styles.accessDeniedContent}>
-            {/* Red Block Icon */}
-            <MaterialIcons name="block" size={120} color="#DC2626" style={styles.accessDeniedIcon} />
+            {/* Block Image */}
+            <Image
+              source={require('@/assets/images/f731a0e8-4ca3-4667-9c8e-d61146a0aff2.png')}
+              style={styles.accessDeniedImage}
+              resizeMode="contain"
+            />
             
-            {/* Title */}
-            <Text style={styles.accessDeniedTitle}>{titleText}</Text>
+            {/* Big Title */}
+            <Text style={styles.accessDeniedBigTitle}>{bigTitleText}</Text>
             
-            {/* Subtitle */}
+            {/* Subtitle (Bold) */}
             <Text style={styles.accessDeniedSubtitle}>{subtitleText}</Text>
+            
+            {/* Description */}
+            <Text style={styles.accessDeniedDescription}>{descriptionText}</Text>
             
             {/* Contact Button */}
             <TouchableOpacity
@@ -204,19 +211,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     maxWidth: 500,
   },
-  accessDeniedIcon: {
+  accessDeniedImage: {
+    width: 120,
+    height: 120,
     marginBottom: 32,
   },
-  accessDeniedTitle: {
-    fontSize: 24,
+  accessDeniedBigTitle: {
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#DC2626',
     textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 32,
+    marginBottom: 20,
+    lineHeight: 40,
     writingDirection: 'rtl',
   },
   accessDeniedSubtitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 12,
+    lineHeight: 26,
+    writingDirection: 'rtl',
+  },
+  accessDeniedDescription: {
     fontSize: 16,
     color: '#6B7280',
     textAlign: 'center',
