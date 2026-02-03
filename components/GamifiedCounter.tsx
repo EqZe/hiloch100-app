@@ -8,6 +8,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   interpolate,
+  Extrapolation,
 } from 'react-native-reanimated';
 
 interface GamifiedCounterProps {
@@ -29,7 +30,7 @@ export default function GamifiedCounter({
   totalDaysCompleted,
   endDate,
 }: GamifiedCounterProps) {
-  console.log('GamifiedCounter: Rendering with stage', currentStage);
+  console.log('GamifiedCounter: Rendering with stage', currentStage, 'stage1Remaining:', stage1Remaining, 'stage2Remaining:', stage2Remaining);
 
   const [isFlipped, setIsFlipped] = useState(false);
   const rotation = useSharedValue(0);
@@ -90,24 +91,44 @@ export default function GamifiedCounter({
   };
 
   const frontAnimatedStyle = useAnimatedStyle(() => {
-    const rotateY = interpolate(rotation.value, [0, 180], [0, 180]);
-    const opacity = interpolate(rotation.value % 360, [0, 90, 90, 180], [1, 0, 0, 1]);
+    const rotateY = interpolate(
+      rotation.value,
+      [0, 180],
+      [0, 180],
+      Extrapolation.CLAMP
+    );
+    
+    const opacity = interpolate(
+      rotation.value % 360,
+      [0, 89, 90, 180],
+      [1, 1, 0, 0],
+      Extrapolation.CLAMP
+    );
     
     return {
       transform: [{ rotateY: `${rotateY}deg` }],
       opacity,
-      backfaceVisibility: 'hidden',
     };
   });
 
   const backAnimatedStyle = useAnimatedStyle(() => {
-    const rotateY = interpolate(rotation.value, [0, 180], [180, 360]);
-    const opacity = interpolate(rotation.value % 360, [0, 90, 90, 180], [0, 1, 1, 0]);
+    const rotateY = interpolate(
+      rotation.value,
+      [0, 180],
+      [180, 360],
+      Extrapolation.CLAMP
+    );
+    
+    const opacity = interpolate(
+      rotation.value % 360,
+      [0, 89, 90, 180],
+      [0, 0, 1, 1],
+      Extrapolation.CLAMP
+    );
     
     return {
       transform: [{ rotateY: `${rotateY}deg` }],
       opacity,
-      backfaceVisibility: 'hidden',
     };
   });
 
@@ -129,7 +150,7 @@ export default function GamifiedCounter({
           onPress={handleCirclePress}
         >
           <View style={styles.flipContainer}>
-            <Animated.View style={[styles.flipSide, frontAnimatedStyle]}>
+            <Animated.View style={[styles.flipSide, frontAnimatedStyle]} pointerEvents="none">
               <View style={styles.mainCircleContent}>
                 <Text style={styles.endDateText}>{endDate}</Text>
                 <Text style={styles.mainNumber}>{currentRemaining}</Text>
@@ -140,7 +161,7 @@ export default function GamifiedCounter({
               </View>
             </Animated.View>
 
-            <Animated.View style={[styles.flipSide, styles.flipSideBack, backAnimatedStyle]}>
+            <Animated.View style={[styles.flipSide, styles.flipSideBack, backAnimatedStyle]} pointerEvents="none">
               <View style={styles.mainCircleContent}>
                 <Text style={styles.endDateText}>{endDate}</Text>
                 <Text style={styles.mainNumber}>{currentProgressRounded}%</Text>
@@ -218,6 +239,7 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    backfaceVisibility: 'hidden',
   },
   flipSideBack: {
     backfaceVisibility: 'hidden',

@@ -68,8 +68,9 @@ export default function CounterScreen() {
 
   const saveStartDate = async (date: Date) => {
     try {
-      await SecureStore.setItemAsync(STORAGE_KEY, date.toISOString());
-      console.log('Saved date:', date);
+      const dateString = date.toISOString();
+      await SecureStore.setItemAsync(STORAGE_KEY, dateString);
+      console.log('Saved date:', dateString);
     } catch (error) {
       console.log('Error saving date:', error);
     }
@@ -84,20 +85,20 @@ export default function CounterScreen() {
     
     const isToday = startDateNormalized.getTime() === today.getTime();
     
+    const actualStartDate = new Date(start);
+    actualStartDate.setDate(actualStartDate.getDate() + 1);
+
+    const threeMonthsDate = new Date(actualStartDate);
+    threeMonthsDate.setMonth(threeMonthsDate.getMonth() + 3);
+
+    const sixMonthsDate = new Date(actualStartDate);
+    sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
+
+    const stage1TotalDays = Math.ceil((threeMonthsDate.getTime() - actualStartDate.getTime()) / (1000 * 3600 * 24));
+    const stage2TotalDays = Math.ceil((sixMonthsDate.getTime() - threeMonthsDate.getTime()) / (1000 * 3600 * 24));
+
     if (isToday) {
-      console.log('Selected date is today - setting stages to 0%');
-      const actualStartDate = new Date(start);
-      actualStartDate.setDate(actualStartDate.getDate() + 1);
-
-      const threeMonthsDate = new Date(actualStartDate);
-      threeMonthsDate.setMonth(threeMonthsDate.getMonth() + 3);
-
-      const sixMonthsDate = new Date(actualStartDate);
-      sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
-
-      const stage1TotalDays = Math.ceil((threeMonthsDate.getTime() - actualStartDate.getTime()) / (1000 * 3600 * 24));
-      const stage2TotalDays = Math.ceil((sixMonthsDate.getTime() - threeMonthsDate.getTime()) / (1000 * 3600 * 24));
-
+      console.log('Selected date is today - setting stages to 0% progress');
       setCalculatedDates({
         threeMonths: threeMonthsDate,
         sixMonths: sixMonthsDate,
@@ -113,20 +114,8 @@ export default function CounterScreen() {
       return;
     }
 
-    const actualStartDate = new Date(start);
-    actualStartDate.setDate(actualStartDate.getDate() + 1);
-
-    const threeMonthsDate = new Date(actualStartDate);
-    threeMonthsDate.setMonth(threeMonthsDate.getMonth() + 3);
-
-    const sixMonthsDate = new Date(actualStartDate);
-    sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
-
     const timeDiff = sixMonthsDate.getTime() - today.getTime();
     const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-    const stage1TotalDays = Math.ceil((threeMonthsDate.getTime() - actualStartDate.getTime()) / (1000 * 3600 * 24));
-    const stage2TotalDays = Math.ceil((sixMonthsDate.getTime() - threeMonthsDate.getTime()) / (1000 * 3600 * 24));
 
     let stage1Remaining = 0;
     let stage2Remaining = 0;
@@ -148,7 +137,7 @@ export default function CounterScreen() {
 
     const showNotification = daysRemaining <= 30 && daysRemaining > 0;
 
-    console.log('Calculated dates - Stage 1 remaining:', stage1Remaining, 'Stage 2 remaining:', stage2Remaining);
+    console.log('Calculated dates - Stage 1 remaining:', stage1Remaining, 'Stage 2 remaining:', stage2Remaining, 'Current stage:', currentStage);
 
     setCalculatedDates({
       threeMonths: threeMonthsDate,
@@ -165,7 +154,7 @@ export default function CounterScreen() {
   }, []);
 
   const handleDateSelect = (date: Date) => {
-    console.log('User selected date:', date);
+    console.log('User selected date:', date.toISOString());
     setStartDate(date);
     saveStartDate(date);
     setDatePickerExpanded(false);
