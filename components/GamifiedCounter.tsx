@@ -1,9 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { colors } from '@/styles/commonStyles';
-import { IconSymbol } from '@/components/IconSymbol';
 import CircularProgress from '@/components/CircularProgress';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  interpolate,
+  Extrapolation,
+} from 'react-native-reanimated';
 
 interface GamifiedCounterProps {
   currentStage: 1 | 2 | 'completed';
@@ -26,6 +32,9 @@ export default function GamifiedCounter({
 }: GamifiedCounterProps) {
   console.log('GamifiedCounter: Rendering with stage', currentStage);
 
+  const rotation = useSharedValue(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+
   const getCurrentStageProgress = () => {
     if (currentStage === 1) {
       const completed = stage1Total - stage1Remaining;
@@ -43,24 +52,13 @@ export default function GamifiedCounter({
     return 0;
   };
 
-  const getNextStageInfo = () => {
-    if (currentStage === 1) {
-      return {
-        title: 'שלב הבא',
-        subtitle: 'מלווה לילה',
-        days: stage2Total,
-        icon: 'nightlight' as const,
-      };
-    }
-    return null;
-  };
-
   const currentProgress = getCurrentStageProgress();
   const currentRemaining = getCurrentStageRemaining();
-  const nextStage = getNextStageInfo();
+  const currentRemainingText = String(currentRemaining);
+  const percentageText = `${Math.round(currentProgress)}%`;
 
   const getCurrentStageTitle = () => {
-    if (currentStage === 1) return 'מלווה';
+    if (currentStage === 1) return 'מלווה 24/7';
     if (currentStage === 2) return 'מלווה לילה';
     return 'הושלם';
   };
@@ -86,114 +84,128 @@ export default function GamifiedCounter({
     return 'כמעט שם! עוד קצת';
   };
 
+  const handleFlip = () => {
+    console.log('GamifiedCounter: Flip button pressed');
+    if (rotation.value === 0) {
+      rotation.value = withTiming(180, { duration: 600 });
+      setIsFlipped(true);
+    } else {
+      rotation.value = withTiming(0, { duration: 600 });
+      setIsFlipped(false);
+    }
+  };
+
+  const frontAnimatedStyle = useAnimatedStyle(() => {
+    const rotateY = interpolate(
+      rotation.value,
+      [0, 180],
+      [0, 180],
+      Extrapolation.CLAMP
+    );
+    const opacity = interpolate(
+      rotation.value,
+      [0, 89, 90, 180],
+      [1, 1, 0, 0],
+      Extrapolation.CLAMP
+    );
+    return {
+      opacity,
+      transform: [{ perspective: 1000 }, { rotateY: `${rotateY}deg` }],
+      backfaceVisibility: 'hidden',
+    };
+  });
+
+  const backAnimatedStyle = useAnimatedStyle(() => {
+    const rotateY = interpolate(
+      rotation.value,
+      [0, 180],
+      [180, 360],
+      Extrapolation.CLAMP
+    );
+    const opacity = interpolate(
+      rotation.value,
+      [0, 89, 90, 180],
+      [0, 0, 1, 1],
+      Extrapolation.CLAMP
+    );
+    return {
+      opacity,
+      transform: [{ perspective: 1000 }, { rotateY: `${rotateY}deg` }],
+      backfaceVisibility: 'hidden',
+    };
+  });
+
+  const showNextStageNote = currentStage === 1 && stage2Remaining > 0;
+  const nextStageNoteText = 'השלב הבא: מלווה לילה';
+
+  const overallProgress = (totalDaysCompleted / (stage1Total + stage2Total)) * 100;
+  const overallProgressText = `${Math.round(overallProgress)}% מהמסלול הושלם`;
+
   return (
     <View style={styles.container}>
       <View style={styles.mainCircleContainer}>
-        <CircularProgress
-          size={280}
-          strokeWidth={20}
-          progress={currentProgress}
-          color={getCurrentStageColor()}
-          backgroundColor="#E0E0E0"
-        >
-          <View style={styles.mainCircleContent}>
-            <Text style={styles.endDateText}>{endDate}</Text>
-            <Text style={styles.mainNumber}>{currentRemaining}</Text>
-            <Text style={styles.mainLabel}>ימים נותרו</Text>
-            <View style={styles.stageIndicator}>
-              <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
-            </View>
-          </View>
-        </CircularProgress>
-      </View>
-
-      <Text style={styles.motivationalText}>{getMotivationalText()}</Text>
-
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
+        <Animated.View style={[styles.flipSide, frontAnimatedStyle]} pointerEvents={isFlipped ? 'none' : 'auto'}>
           <CircularProgress
-            size={100}
-            strokeWidth={8}
-            progress={(totalDaysCompleted / (stage1Total + stage2Total)) * 100}
-            color="#FF9800"
-            backgroundColor="#FFE0B2"
+            size={280}
+            strokeWidth={20}
+            progress={currentProgress}
+            color={getCurrentStageColor()}
+            backgroundColor="#E0E0E0"
+            onPress={handleFlip}
           >
-            <View style={styles.statContent}>
-              <IconSymbol
-                ios_icon_name="calendar"
-                android_material_icon_name="calendar-today"
-                size={24}
-                color="#FF9800"
-              />
-              <Text style={styles.statNumber}>{totalDaysCompleted}</Text>
+            <View style={styles.mainCircleContent}>
+              <Text style={styles.endDateText}>{endDate}</Text>
+              <Text style={styles.mainNumber}>{currentRemainingText}</Text>
+              <Text style={styles.mainLabel}>ימים נותרו</Text>
+              <View style={styles.stageIndicator}>
+                <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+              </View>
             </View>
           </CircularProgress>
-          <Text style={styles.statLabel}>ימים הושלמו</Text>
-        </View>
+        </Animated.View>
 
-        {nextStage && (
-          <View style={styles.statCard}>
-            <CircularProgress
-              size={100}
-              strokeWidth={8}
-              progress={0}
-              color="#9C27B0"
-              backgroundColor="#E1BEE7"
-            >
-              <View style={styles.statContent}>
-                <IconSymbol
-                  ios_icon_name="moon.fill"
-                  android_material_icon_name={nextStage.icon}
-                  size={24}
-                  color="#9C27B0"
-                />
-                <Text style={styles.statNumber}>{nextStage.days}</Text>
+        <Animated.View style={[styles.flipSide, styles.flipSideBack, backAnimatedStyle]} pointerEvents={isFlipped ? 'auto' : 'none'}>
+          <CircularProgress
+            size={280}
+            strokeWidth={20}
+            progress={currentProgress}
+            color={getCurrentStageColor()}
+            backgroundColor="#E0E0E0"
+            onPress={handleFlip}
+          >
+            <View style={styles.mainCircleContent}>
+              <Text style={styles.endDateText}>{endDate}</Text>
+              <Text style={styles.mainNumber}>{percentageText}</Text>
+              <Text style={styles.mainLabel}>הושלם</Text>
+              <View style={styles.stageIndicator}>
+                <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
               </View>
-            </CircularProgress>
-            <Text style={styles.statLabel}>{nextStage.title}</Text>
-            <Text style={styles.statSubLabel}>{nextStage.subtitle}</Text>
-          </View>
-        )}
-
-        {currentStage === 'completed' && (
-          <View style={styles.statCard}>
-            <CircularProgress
-              size={100}
-              strokeWidth={8}
-              progress={100}
-              color="#4CAF50"
-              backgroundColor="#C8E6C9"
-            >
-              <View style={styles.statContent}>
-                <IconSymbol
-                  ios_icon_name="checkmark.circle.fill"
-                  android_material_icon_name="check-circle"
-                  size={32}
-                  color="#4CAF50"
-                />
-              </View>
-            </CircularProgress>
-            <Text style={styles.statLabel}>הושלם!</Text>
-          </View>
-        )}
+            </View>
+          </CircularProgress>
+        </Animated.View>
       </View>
+
+      {showNextStageNote && (
+        <Text style={styles.nextStageNote}>{nextStageNoteText}</Text>
+      )}
+
+      <Text style={styles.motivationalText}>{getMotivationalText()}</Text>
 
       {currentStage !== 'completed' && (
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBarWrapper}>
             <View style={styles.progressBarBackground}>
+              <View style={styles.progressBarNightSection} />
               <View
                 style={[
                   styles.progressBarFill,
                   {
-                    width: `${(totalDaysCompleted / (stage1Total + stage2Total)) * 100}%`,
+                    width: `${overallProgress}%`,
                   },
                 ]}
               />
             </View>
-            <Text style={styles.progressBarText}>
-              {Math.round((totalDaysCompleted / (stage1Total + stage2Total)) * 100)}% מהמסלול הושלם
-            </Text>
+            <Text style={styles.progressBarText}>{overallProgressText}</Text>
           </View>
         </View>
       )}
@@ -208,6 +220,7 @@ const styles = StyleSheet.create({
   },
   mainCircleContainer: {
     marginBottom: 20,
+    position: 'relative',
     ...Platform.select({
       ios: {
         shadowColor: '#4FC3F7',
@@ -222,6 +235,12 @@ const styles = StyleSheet.create({
         boxShadow: '0px 8px 30px rgba(79, 195, 247, 0.4)',
       },
     }),
+  },
+  flipSide: {
+    position: 'absolute',
+  },
+  flipSideBack: {
+    position: 'absolute',
   },
   mainCircleContent: {
     alignItems: 'center',
@@ -257,6 +276,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
+  nextStageNote: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 20,
+  },
   motivationalText: {
     fontSize: 18,
     fontWeight: '700',
@@ -264,39 +291,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 30,
     paddingHorizontal: 20,
-  },
-  statsContainer: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'center',
-    gap: 24,
-    marginBottom: 30,
-    flexWrap: 'wrap',
-  },
-  statCard: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  statContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-  },
-  statNumber: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: colors.text,
-  },
-  statLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    textAlign: 'center',
-  },
-  statSubLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: colors.textSecondary,
-    textAlign: 'center',
   },
   progressBarContainer: {
     width: '100%',
@@ -310,11 +304,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
     borderRadius: 6,
     overflow: 'hidden',
+    position: 'relative',
+  },
+  progressBarNightSection: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: '50%',
+    backgroundColor: '#9E9E9E',
+    borderRadius: 6,
   },
   progressBarFill: {
     height: '100%',
     backgroundColor: '#4FC3F7',
     borderRadius: 6,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
   },
   progressBarText: {
     fontSize: 14,

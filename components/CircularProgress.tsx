@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 
 interface CircularProgressProps {
@@ -10,6 +10,7 @@ interface CircularProgressProps {
   color: string;
   backgroundColor?: string;
   children?: React.ReactNode;
+  onPress?: () => void;
 }
 
 export default function CircularProgress({
@@ -19,12 +20,13 @@ export default function CircularProgress({
   color,
   backgroundColor = '#E0E0E0',
   children,
+  onPress,
 }: CircularProgressProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const progressOffset = circumference - (progress / 100) * circumference;
 
-  return (
+  const content = (
     <View style={[styles.container, { width: size, height: size }]}>
       <Svg width={size} height={size}>
         <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
@@ -52,6 +54,16 @@ export default function CircularProgress({
       <View style={styles.content}>{children}</View>
     </View>
   );
+
+  if (onPress) {
+    return (
+      <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+        {content}
+      </TouchableOpacity>
+    );
+  }
+
+  return content;
 }
 
 const styles = StyleSheet.create({
