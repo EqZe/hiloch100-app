@@ -50,7 +50,7 @@ export default function CounterScreen() {
     }
   }, [startDate]);
 
-  const loadStartDate = async () => {
+  const loadStartDate = () => {
     try {
       const savedDate = localStorage.getItem(STORAGE_KEY);
       if (savedDate) {
@@ -64,10 +64,9 @@ export default function CounterScreen() {
     }
   };
 
-  const saveStartDate = async (date: Date) => {
+  const saveStartDate = (date: Date) => {
     try {
-      const dateString = date.toISOString();
-      localStorage.setItem(STORAGE_KEY, dateString);
+      localStorage.setItem(STORAGE_KEY, date.toISOString());
       console.log('Saved date to localStorage:', date);
     } catch (error) {
       console.log('Error saving date:', error);
@@ -83,20 +82,20 @@ export default function CounterScreen() {
     
     const isToday = startDateNormalized.getTime() === today.getTime();
     
-    const actualStartDate = new Date(start);
-    actualStartDate.setDate(actualStartDate.getDate() + 1);
-
-    const threeMonthsDate = new Date(actualStartDate);
-    threeMonthsDate.setMonth(threeMonthsDate.getMonth() + 3);
-
-    const sixMonthsDate = new Date(actualStartDate);
-    sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
-
-    const stage1TotalDays = Math.ceil((threeMonthsDate.getTime() - actualStartDate.getTime()) / (1000 * 3600 * 24));
-    const stage2TotalDays = Math.ceil((sixMonthsDate.getTime() - threeMonthsDate.getTime()) / (1000 * 3600 * 24));
-
     if (isToday) {
-      console.log('Selected date is today - setting stages to 0% progress');
+      console.log('Selected date is today - setting stages to 0%');
+      const actualStartDate = new Date(start);
+      actualStartDate.setDate(actualStartDate.getDate() + 1);
+
+      const threeMonthsDate = new Date(actualStartDate);
+      threeMonthsDate.setMonth(threeMonthsDate.getMonth() + 3);
+
+      const sixMonthsDate = new Date(actualStartDate);
+      sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
+
+      const stage1TotalDays = Math.ceil((threeMonthsDate.getTime() - actualStartDate.getTime()) / (1000 * 3600 * 24));
+      const stage2TotalDays = Math.ceil((sixMonthsDate.getTime() - threeMonthsDate.getTime()) / (1000 * 3600 * 24));
+
       setCalculatedDates({
         threeMonths: threeMonthsDate,
         sixMonths: sixMonthsDate,
@@ -112,8 +111,20 @@ export default function CounterScreen() {
       return;
     }
 
+    const actualStartDate = new Date(start);
+    actualStartDate.setDate(actualStartDate.getDate() + 1);
+
+    const threeMonthsDate = new Date(actualStartDate);
+    threeMonthsDate.setMonth(threeMonthsDate.getMonth() + 3);
+
+    const sixMonthsDate = new Date(actualStartDate);
+    sixMonthsDate.setMonth(sixMonthsDate.getMonth() + 6);
+
     const timeDiff = sixMonthsDate.getTime() - today.getTime();
     const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    const stage1TotalDays = Math.ceil((threeMonthsDate.getTime() - actualStartDate.getTime()) / (1000 * 3600 * 24));
+    const stage2TotalDays = Math.ceil((sixMonthsDate.getTime() - threeMonthsDate.getTime()) / (1000 * 3600 * 24));
 
     let stage1Remaining = 0;
     let stage2Remaining = 0;
@@ -135,7 +146,7 @@ export default function CounterScreen() {
 
     const showNotification = daysRemaining <= 30 && daysRemaining > 0;
 
-    console.log('Calculated dates - Stage 1 remaining:', stage1Remaining, 'Stage 2 remaining:', stage2Remaining, 'Current stage:', currentStage);
+    console.log('Calculated dates - Stage 1 remaining:', stage1Remaining, 'Stage 2 remaining:', stage2Remaining);
 
     setCalculatedDates({
       threeMonths: threeMonthsDate,
@@ -166,7 +177,6 @@ export default function CounterScreen() {
   };
 
   const handleClearDate = () => {
-    console.log('User tapped clear date button');
     const confirmed = window.confirm('האם אתה בטוח שברצונך למחוק את התאריך?');
     if (confirmed) {
       console.log('Clearing saved date');
@@ -219,7 +229,7 @@ export default function CounterScreen() {
           <Text style={styles.title}>ספירת ימי מלווה</Text>
         </View>
 
-        {!startDate && datePickerExpanded && (
+        {datePickerExpanded ? (
           <View style={styles.dateCard}>
             <View style={styles.dateCardHeader}>
               <Text style={styles.dateCardTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
@@ -258,7 +268,70 @@ export default function CounterScreen() {
               />
               <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
             </TouchableOpacity>
+
+            {startDate && (
+              <>
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={handleClearDate}
+                >
+                  <Text style={styles.clearButtonText}>מחק תאריך</Text>
+                  <IconSymbol
+                    ios_icon_name="trash"
+                    android_material_icon_name="delete"
+                    size={16}
+                    color={colors.textSecondary}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.collapseButton}
+                  onPress={() => {
+                    console.log('User tapped to collapse date picker');
+                    setDatePickerExpanded(false);
+                  }}
+                >
+                  <Text style={styles.collapseButtonText}>כווץ</Text>
+                  <IconSymbol
+                    ios_icon_name="chevron.up"
+                    android_material_icon_name="expand-less"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                </TouchableOpacity>
+              </>
+            )}
           </View>
+        ) : (
+          <TouchableOpacity
+            style={styles.dateCardCollapsed}
+            onPress={() => {
+              console.log('User tapped to expand date picker');
+              setDatePickerExpanded(true);
+            }}
+          >
+            <View style={styles.collapsedContent}>
+              <View style={styles.collapsedLeft}>
+                <IconSymbol
+                  ios_icon_name="calendar"
+                  android_material_icon_name="calendar-today"
+                  size={28}
+                  color={colors.primary}
+                />
+              </View>
+              <View style={styles.collapsedCenter}>
+                <Text style={styles.collapsedTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
+                <Text style={styles.collapsedDateValue}>{startDateDisplay}</Text>
+              </View>
+              <View style={styles.collapsedRight}>
+                <IconSymbol
+                  ios_icon_name="chevron.down"
+                  android_material_icon_name="expand-more"
+                  size={24}
+                  color={colors.textSecondary}
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
         )}
 
         {calculatedDates && (
@@ -292,7 +365,7 @@ export default function CounterScreen() {
                       />
                     </View>
                     <View style={styles.collapsedCenter}>
-                      <Text style={styles.collapsedTitle}>שלב 1 - מלווה 24/7</Text>
+                      <Text style={styles.collapsedTitle}>שלב 1 - מלווה</Text>
                       <Text style={styles.collapsedStatus}>הסתיים</Text>
                     </View>
                     <View style={styles.collapsedRight}>
@@ -313,7 +386,7 @@ export default function CounterScreen() {
                 ]}>
                   <View style={styles.stageHeader}>
                     <View style={styles.stageTitleContainer}>
-                      <Text style={styles.stageTitle}>שלב 1 - מלווה 24/7</Text>
+                      <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
                       <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
                     </View>
                     <View style={styles.stageIconContainer}>
@@ -511,111 +584,6 @@ export default function CounterScreen() {
               בחר את תאריך תשלום אגרת היתר נהיגה כדי לראות את החישוב המפורט
             </Text>
           </View>
-        )}
-
-        {startDate && (
-          <>
-            {datePickerExpanded ? (
-              <View style={styles.dateCard}>
-                <View style={styles.dateCardHeader}>
-                  <Text style={styles.dateCardTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
-                  <IconSymbol
-                    ios_icon_name="calendar"
-                    android_material_icon_name="calendar-today"
-                    size={24}
-                    color={colors.primary}
-                  />
-                </View>
-                
-                <View style={styles.infoBox}>
-                  <IconSymbol
-                    ios_icon_name="info.circle.fill"
-                    android_material_icon_name="info"
-                    size={18}
-                    color="#4FC3F7"
-                  />
-                  <Text style={styles.infoText}>
-                    מדובר בתאריך בו שילמת את האגרה - לא בתאריך מעבר הטסט
-                  </Text>
-                </View>
-
-                <TouchableOpacity
-                  style={styles.dateButton}
-                  onPress={() => {
-                    console.log('User tapped select date button');
-                    setShowPicker(true);
-                  }}
-                >
-                  <IconSymbol
-                    ios_icon_name="chevron.down"
-                    android_material_icon_name="arrow-drop-down"
-                    size={24}
-                    color={colors.textSecondary}
-                  />
-                  <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.clearButton}
-                  onPress={handleClearDate}
-                >
-                  <Text style={styles.clearButtonText}>מחק תאריך</Text>
-                  <IconSymbol
-                    ios_icon_name="trash"
-                    android_material_icon_name="delete"
-                    size={16}
-                    color={colors.textSecondary}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.collapseButton}
-                  onPress={() => {
-                    console.log('User tapped to collapse date picker');
-                    setDatePickerExpanded(false);
-                  }}
-                >
-                  <Text style={styles.collapseButtonText}>כווץ</Text>
-                  <IconSymbol
-                    ios_icon_name="chevron.up"
-                    android_material_icon_name="expand-less"
-                    size={18}
-                    color={colors.textSecondary}
-                  />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.dateCardCollapsed}
-                onPress={() => {
-                  console.log('User tapped to expand date picker');
-                  setDatePickerExpanded(true);
-                }}
-              >
-                <View style={styles.collapsedContent}>
-                  <View style={styles.collapsedLeft}>
-                    <IconSymbol
-                      ios_icon_name="calendar"
-                      android_material_icon_name="calendar-today"
-                      size={28}
-                      color={colors.primary}
-                    />
-                  </View>
-                  <View style={styles.collapsedCenter}>
-                    <Text style={styles.collapsedTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
-                    <Text style={styles.collapsedDateValue}>{startDateDisplay}</Text>
-                  </View>
-                  <View style={styles.collapsedRight}>
-                    <IconSymbol
-                      ios_icon_name="chevron.down"
-                      android_material_icon_name="expand-more"
-                      size={24}
-                      color={colors.textSecondary}
-                    />
-                  </View>
-                </View>
-              </TouchableOpacity>
-            )}
-          </>
         )}
       </ScrollView>
 
