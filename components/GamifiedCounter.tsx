@@ -141,12 +141,22 @@ export default function GamifiedCounter({
   const overallProgress = (totalDaysCompleted / (stage1Total + stage2Total)) * 100;
   const overallProgressText = `${Math.round(overallProgress)}% מהמסלול הושלם`;
 
+  const circleSize = 280;
+
   return (
     <View style={styles.container}>
-      <View style={styles.mainCircleContainer}>
-        <Animated.View style={[styles.flipSide, frontAnimatedStyle]} pointerEvents={isFlipped ? 'none' : 'auto'}>
+      <View style={[styles.mainCircleContainer, { width: circleSize, height: circleSize }]}>
+        <Animated.View 
+          style={[
+            styles.flipSide, 
+            { width: circleSize, height: circleSize },
+            frontAnimatedStyle,
+            { zIndex: isFlipped ? 0 : 1 }
+          ]} 
+          pointerEvents={isFlipped ? 'none' : 'auto'}
+        >
           <CircularProgress
-            size={280}
+            size={circleSize}
             strokeWidth={20}
             progress={currentProgress}
             color={getCurrentStageColor()}
@@ -164,9 +174,18 @@ export default function GamifiedCounter({
           </CircularProgress>
         </Animated.View>
 
-        <Animated.View style={[styles.flipSide, styles.flipSideBack, backAnimatedStyle]} pointerEvents={isFlipped ? 'auto' : 'none'}>
+        <Animated.View 
+          style={[
+            styles.flipSide, 
+            styles.flipSideBack, 
+            { width: circleSize, height: circleSize },
+            backAnimatedStyle,
+            { zIndex: isFlipped ? 1 : 0 }
+          ]} 
+          pointerEvents={isFlipped ? 'auto' : 'none'}
+        >
           <CircularProgress
-            size={280}
+            size={circleSize}
             strokeWidth={20}
             progress={currentProgress}
             color={getCurrentStageColor()}
@@ -221,6 +240,8 @@ const styles = StyleSheet.create({
   mainCircleContainer: {
     marginBottom: 20,
     position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
     ...Platform.select({
       ios: {
         shadowColor: '#4FC3F7',
@@ -238,9 +259,19 @@ const styles = StyleSheet.create({
   },
   flipSide: {
     position: 'absolute',
+    top: 0,
+    left: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backfaceVisibility: 'hidden',
   },
   flipSideBack: {
     position: 'absolute',
+    top: 0,
+    left: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backfaceVisibility: 'hidden',
   },
   mainCircleContent: {
     alignItems: 'center',
