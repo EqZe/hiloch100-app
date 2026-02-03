@@ -225,114 +225,7 @@ export default function CounterScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>ספירת ימי מלווה</Text>
-        </View>
-
-        {datePickerExpanded ? (
-          <View style={styles.dateCard}>
-            <View style={styles.dateCardHeader}>
-              <Text style={styles.dateCardTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
-              <IconSymbol
-                ios_icon_name="calendar"
-                android_material_icon_name="calendar-today"
-                size={24}
-                color={colors.primary}
-              />
-            </View>
-            
-            <View style={styles.infoBox}>
-              <IconSymbol
-                ios_icon_name="info.circle.fill"
-                android_material_icon_name="info"
-                size={18}
-                color="#4FC3F7"
-              />
-              <Text style={styles.infoText}>
-                מדובר בתאריך בו שילמת את האגרה - לא בתאריך מעבר הטסט
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.dateButton}
-              onPress={() => {
-                console.log('User tapped select date button');
-                setShowPicker(true);
-              }}
-            >
-              <IconSymbol
-                ios_icon_name="chevron.down"
-                android_material_icon_name="arrow-drop-down"
-                size={24}
-                color={colors.textSecondary}
-              />
-              <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
-            </TouchableOpacity>
-
-            {startDate && (
-              <>
-                <TouchableOpacity
-                  style={styles.clearButton}
-                  onPress={handleClearDate}
-                >
-                  <Text style={styles.clearButtonText}>מחק תאריך</Text>
-                  <IconSymbol
-                    ios_icon_name="trash"
-                    android_material_icon_name="delete"
-                    size={16}
-                    color={colors.textSecondary}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.collapseButton}
-                  onPress={() => {
-                    console.log('User tapped to collapse date picker');
-                    setDatePickerExpanded(false);
-                  }}
-                >
-                  <Text style={styles.collapseButtonText}>כווץ</Text>
-                  <IconSymbol
-                    ios_icon_name="chevron.up"
-                    android_material_icon_name="expand-less"
-                    size={18}
-                    color={colors.textSecondary}
-                  />
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        ) : (
-          <TouchableOpacity
-            style={styles.dateCardCollapsed}
-            onPress={() => {
-              console.log('User tapped to expand date picker');
-              setDatePickerExpanded(true);
-            }}
-          >
-            <View style={styles.collapsedContent}>
-              <View style={styles.collapsedLeft}>
-                <IconSymbol
-                  ios_icon_name="calendar"
-                  android_material_icon_name="calendar-today"
-                  size={28}
-                  color={colors.primary}
-                />
-              </View>
-              <View style={styles.collapsedCenter}>
-                <Text style={styles.collapsedTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
-                <Text style={styles.collapsedDateValue}>{startDateDisplay}</Text>
-              </View>
-              <View style={styles.collapsedRight}>
-                <IconSymbol
-                  ios_icon_name="chevron.down"
-                  android_material_icon_name="expand-more"
-                  size={24}
-                  color={colors.textSecondary}
-                />
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
+        <View style={styles.topSpacer} />
 
         {calculatedDates && (
           <>
@@ -585,6 +478,111 @@ export default function CounterScreen() {
             </Text>
           </View>
         )}
+
+        {datePickerExpanded ? (
+          <View style={styles.dateCard}>
+            <View style={styles.dateCardHeader}>
+              <Text style={styles.dateCardTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
+              <IconSymbol
+                ios_icon_name="calendar"
+                android_material_icon_name="calendar-today"
+                size={24}
+                color={colors.primary}
+              />
+            </View>
+            
+            <View style={styles.infoBox}>
+              <IconSymbol
+                ios_icon_name="info.circle.fill"
+                android_material_icon_name="info"
+                size={18}
+                color="#4FC3F7"
+              />
+              <Text style={styles.infoText}>
+                מדובר בתאריך בו שילמת את האגרה - לא בתאריך מעבר הטסט
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={() => {
+                console.log('User tapped select date button');
+                setShowPicker(true);
+              }}
+            >
+              <IconSymbol
+                ios_icon_name="chevron.down"
+                android_material_icon_name="arrow-drop-down"
+                size={24}
+                color={colors.textSecondary}
+              />
+              <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
+            </TouchableOpacity>
+
+            {startDate && (
+              <>
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={handleClearDate}
+                >
+                  <Text style={styles.clearButtonText}>מחק תאריך</Text>
+                  <IconSymbol
+                    ios_icon_name="trash"
+                    android_material_icon_name="delete"
+                    size={16}
+                    color={colors.textSecondary}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.collapseButton}
+                  onPress={() => {
+                    console.log('User tapped to collapse date picker');
+                    setDatePickerExpanded(false);
+                  }}
+                >
+                  <Text style={styles.collapseButtonText}>כווץ</Text>
+                  <IconSymbol
+                    ios_icon_name="chevron.up"
+                    android_material_icon_name="expand-less"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={styles.dateCardCollapsed}
+            onPress={() => {
+              console.log('User tapped to expand date picker');
+              setDatePickerExpanded(true);
+            }}
+          >
+            <View style={styles.collapsedContent}>
+              <View style={styles.collapsedLeft}>
+                <IconSymbol
+                  ios_icon_name="calendar"
+                  android_material_icon_name="calendar-today"
+                  size={28}
+                  color={colors.primary}
+                />
+              </View>
+              <View style={styles.collapsedCenter}>
+                <Text style={styles.collapsedTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
+                <Text style={styles.collapsedDateValue}>{startDateDisplay}</Text>
+              </View>
+              <View style={styles.collapsedRight}>
+                <IconSymbol
+                  ios_icon_name="chevron.down"
+                  android_material_icon_name="expand-more"
+                  size={24}
+                  color={colors.textSecondary}
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       <CustomDatePicker
@@ -610,21 +608,14 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 120,
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 28,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: colors.text,
-    textAlign: 'center',
+  topSpacer: {
+    height: 28,
   },
   dateCard: {
     backgroundColor: colors.card,
     borderRadius: 20,
     padding: 20,
-    marginBottom: 24,
+    marginTop: 24,
     borderWidth: 1,
     borderColor: colors.border,
     boxShadow: '0px 4px 16px rgba(79, 195, 247, 0.12)',
@@ -633,7 +624,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 24,
+    marginTop: 24,
     borderWidth: 1,
     borderColor: colors.border,
     boxShadow: '0px 2px 10px rgba(79, 195, 247, 0.1)',

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { colors } from '@/styles/commonStyles';
 import CircularProgress from '@/components/CircularProgress';
@@ -84,7 +84,7 @@ export default function GamifiedCounter({
     return 'כמעט שם! עוד קצת';
   };
 
-  const handleFlip = () => {
+  const handleFlip = useCallback(() => {
     console.log('GamifiedCounter: Flip button pressed');
     if (rotation.value === 0) {
       rotation.value = withTiming(180, { duration: 600 });
@@ -93,7 +93,7 @@ export default function GamifiedCounter({
       rotation.value = withTiming(0, { duration: 600 });
       setIsFlipped(false);
     }
-  };
+  }, [rotation]);
 
   const frontAnimatedStyle = useAnimatedStyle(() => {
     const rotateY = interpolate(
@@ -139,7 +139,7 @@ export default function GamifiedCounter({
   const nextStageNoteText = 'השלב הבא: מלווה לילה';
 
   const overallProgress = (totalDaysCompleted / (stage1Total + stage2Total)) * 100;
-  const overallProgressText = `${Math.round(overallProgress)}% מהמסלול הושלם`;
+  const overallProgressText = `${Math.round(overallProgress)}% מהליך הליווי הכולל הושלם`;
 
   const circleSize = 280;
 
@@ -164,11 +164,13 @@ export default function GamifiedCounter({
             onPress={handleFlip}
           >
             <View style={styles.mainCircleContent}>
-              <Text style={styles.endDateText}>{endDate}</Text>
-              <Text style={styles.mainNumber}>{currentRemainingText}</Text>
-              <Text style={styles.mainLabel}>ימים נותרו</Text>
-              <View style={styles.stageIndicator}>
-                <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+              <View style={styles.whiteBackground}>
+                <Text style={styles.endDateText}>{endDate}</Text>
+                <Text style={styles.mainNumber}>{currentRemainingText}</Text>
+                <Text style={styles.mainLabel}>ימים נותרו</Text>
+                <View style={styles.stageIndicator}>
+                  <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+                </View>
               </View>
             </View>
           </CircularProgress>
@@ -193,11 +195,13 @@ export default function GamifiedCounter({
             onPress={handleFlip}
           >
             <View style={styles.mainCircleContent}>
-              <Text style={styles.endDateText}>{endDate}</Text>
-              <Text style={styles.mainNumber}>{percentageText}</Text>
-              <Text style={styles.mainLabel}>הושלם</Text>
-              <View style={styles.stageIndicator}>
-                <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+              <View style={styles.whiteBackground}>
+                <Text style={styles.endDateText}>{endDate}</Text>
+                <Text style={styles.mainNumber}>{percentageText}</Text>
+                <Text style={styles.mainLabel}>הושלם</Text>
+                <View style={styles.stageIndicator}>
+                  <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+                </View>
               </View>
             </View>
           </CircularProgress>
@@ -274,6 +278,13 @@ const styles = StyleSheet.create({
     backfaceVisibility: 'hidden',
   },
   mainCircleContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  whiteBackground: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 200,
+    padding: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -354,6 +365,22 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
+    fontWeight: '900',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#4FC3F7',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.8,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 6,
+      },
+      web: {
+        boxShadow: '0px 3px 12px rgba(79, 195, 247, 0.8)',
+        fontWeight: 'bold',
+      },
+    }),
   },
   progressBarText: {
     fontSize: 14,
