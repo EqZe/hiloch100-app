@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { colors } from '@/styles/commonStyles';
 import CircularProgress from '@/components/CircularProgress';
@@ -38,17 +38,17 @@ export default function GamifiedCounter({
   const getCurrentStageProgress = () => {
     if (currentStage === 1) {
       const completed = stage1Total - stage1Remaining;
-      return (completed / stage1Total) * 100;
+      return Math.max(0, Math.min(100, (completed / stage1Total) * 100));
     } else if (currentStage === 2) {
       const completed = stage2Total - stage2Remaining;
-      return (completed / stage2Total) * 100;
+      return Math.max(0, Math.min(100, (completed / stage2Total) * 100));
     }
     return 100;
   };
 
   const getCurrentStageRemaining = () => {
-    if (currentStage === 1) return stage1Remaining;
-    if (currentStage === 2) return stage2Remaining;
+    if (currentStage === 1) return Math.max(0, stage1Remaining);
+    if (currentStage === 2) return Math.max(0, stage2Remaining);
     return 0;
   };
 
@@ -84,7 +84,11 @@ export default function GamifiedCounter({
     return 'כמעט שם! עוד קצת';
   };
 
-  const handleFlip = () => {
+  // Check if fully completed
+  const isFullyCompleted = stage1Remaining === 0 && stage2Remaining === 0 && currentStage === 'completed';
+
+  const handleFlip = useCallback(() => {
+    if (isFullyCompleted) return; // Cannot flip if completed
     console.log('GamifiedCounter: Flip button pressed');
     if (rotation.value === 0) {
       rotation.value = withTiming(180, { duration: 600 });
@@ -93,7 +97,7 @@ export default function GamifiedCounter({
       rotation.value = withTiming(0, { duration: 600 });
       setIsFlipped(false);
     }
-  };
+  }, [rotation, isFullyCompleted]);
 
   const frontAnimatedStyle = useAnimatedStyle(() => {
     const rotateY = interpolate(
@@ -138,70 +142,96 @@ export default function GamifiedCounter({
   const showNextStageNote = currentStage === 1 && stage2Remaining > 0;
   const nextStageNoteText = 'השלב הבא: מלווה לילה';
 
-  const overallProgress = (totalDaysCompleted / (stage1Total + stage2Total)) * 100;
-  const overallProgressText = `${Math.round(overallProgress)}% מהמסלול הושלם`;
+  const totalDays = stage1Total + stage2Total;
+  const overallProgress = totalDays > 0 ? Math.max(0, Math.min(100, (totalDaysCompleted / totalDays) * 100)) : 0;
+  const overallProgressText = `${Math.round(overallProgress)}% מהליך הליווי הכולל הושלם`;
 
   const circleSize = 280;
+
+  // Completion messages
+  const completionMessage1 = '!סיימת מלווה';
+  const completionMessage2 = 'מהילוך מאה';
+  const completionMessage3 = 'תהנה עם הרישיון';
 
   return (
     <View style={styles.container}>
       <View style={[styles.mainCircleContainer, { width: circleSize, height: circleSize }]}>
-        <Animated.View 
-          style={[
-            styles.flipSide, 
-            { width: circleSize, height: circleSize },
-            frontAnimatedStyle,
-            { zIndex: isFlipped ? 0 : 1 }
-          ]} 
-          pointerEvents={isFlipped ? 'none' : 'auto'}
-        >
+        {isFullyCompleted ? (
+          // Show completion message
           <CircularProgress
             size={circleSize}
             strokeWidth={20}
-            progress={currentProgress}
-            color={getCurrentStageColor()}
+            progress={100}
+            color="#4CAF50"
             backgroundColor="#E0E0E0"
-            onPress={handleFlip}
           >
-            <View style={styles.mainCircleContent}>
-              <Text style={styles.endDateText}>{endDate}</Text>
-              <Text style={styles.mainNumber}>{currentRemainingText}</Text>
-              <Text style={styles.mainLabel}>ימים נותרו</Text>
-              <View style={styles.stageIndicator}>
-                <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
-              </View>
+            <View style={styles.completionContent}>
+              <Text style={styles.completionMessage1}>{completionMessage1}</Text>
+              <Text style={styles.completionMessage2}>{completionMessage2}</Text>
+              <Text style={styles.completionMessage3}>{completionMessage3}</Text>
             </View>
           </CircularProgress>
-        </Animated.View>
+        ) : (
+          // Show normal flip animation
+          <>
+            <Animated.View 
+              style={[
+                styles.flipSide, 
+                { width: circleSize, height: circleSize },
+                frontAnimatedStyle,
+                { zIndex: isFlipped ? 0 : 1 }
+              ]} 
+              pointerEvents={isFlipped ? 'none' : 'auto'}
+            >
+              <CircularProgress
+                size={circleSize}
+                strokeWidth={20}
+                progress={currentProgress}
+                color={getCurrentStageColor()}
+                backgroundColor="#E0E0E0"
+                onPress={handleFlip}
+              >
+                <View style={styles.mainCircleContent}>
+                  <Text style={styles.endDateText}>{endDate}</Text>
+                  <Text style={styles.mainNumber}>{currentRemainingText}</Text>
+                  <Text style={styles.mainLabel}>ימים נותרו</Text>
+                  <View style={styles.stageIndicator}>
+                    <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+                  </View>
+                </View>
+              </CircularProgress>
+            </Animated.View>
 
-        <Animated.View 
-          style={[
-            styles.flipSide, 
-            styles.flipSideBack, 
-            { width: circleSize, height: circleSize },
-            backAnimatedStyle,
-            { zIndex: isFlipped ? 1 : 0 }
-          ]} 
-          pointerEvents={isFlipped ? 'auto' : 'none'}
-        >
-          <CircularProgress
-            size={circleSize}
-            strokeWidth={20}
-            progress={currentProgress}
-            color={getCurrentStageColor()}
-            backgroundColor="#E0E0E0"
-            onPress={handleFlip}
-          >
-            <View style={styles.mainCircleContent}>
-              <Text style={styles.endDateText}>{endDate}</Text>
-              <Text style={styles.mainNumber}>{percentageText}</Text>
-              <Text style={styles.mainLabel}>הושלם</Text>
-              <View style={styles.stageIndicator}>
-                <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
-              </View>
-            </View>
-          </CircularProgress>
-        </Animated.View>
+            <Animated.View 
+              style={[
+                styles.flipSide, 
+                styles.flipSideBack, 
+                { width: circleSize, height: circleSize },
+                backAnimatedStyle,
+                { zIndex: isFlipped ? 1 : 0 }
+              ]} 
+              pointerEvents={isFlipped ? 'auto' : 'none'}
+            >
+              <CircularProgress
+                size={circleSize}
+                strokeWidth={20}
+                progress={currentProgress}
+                color={getCurrentStageColor()}
+                backgroundColor="#E0E0E0"
+                onPress={handleFlip}
+              >
+                <View style={styles.mainCircleContent}>
+                  <Text style={styles.endDateText}>{endDate}</Text>
+                  <Text style={styles.mainNumber}>{percentageText}</Text>
+                  <Text style={styles.mainLabel}>הושלם</Text>
+                  <View style={styles.stageIndicator}>
+                    <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+                  </View>
+                </View>
+              </CircularProgress>
+            </Animated.View>
+          </>
+        )}
       </View>
 
       {showNextStageNote && (
@@ -276,6 +306,31 @@ const styles = StyleSheet.create({
   mainCircleContent: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  completionContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+  },
+  completionMessage1: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#4CAF50',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  completionMessage2: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  completionMessage3: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    textAlign: 'center',
   },
   endDateText: {
     fontSize: 14,

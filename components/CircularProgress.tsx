@@ -36,7 +36,7 @@ export default function CircularProgress({
             r={radius}
             stroke={backgroundColor}
             strokeWidth={strokeWidth}
-            fill="none"
+            fill="transparent"
           />
           <Circle
             cx={size / 2}
@@ -44,7 +44,7 @@ export default function CircularProgress({
             r={radius}
             stroke={color}
             strokeWidth={strokeWidth}
-            fill="none"
+            fill="transparent"
             strokeDasharray={circumference}
             strokeDashoffset={progressOffset}
             strokeLinecap="round"
