@@ -253,6 +253,8 @@ export default function CounterScreen() {
     return formatDate(calculatedDates.sixMonths);
   };
 
+  const datePickerTitle = 'תשלום אגרת היתר נהיגה';
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView
@@ -266,7 +268,7 @@ export default function CounterScreen() {
         {datePickerExpanded ? (
           <View style={styles.dateCard}>
             <View style={styles.dateCardHeader}>
-              <Text style={styles.dateCardTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
+              <Text style={styles.dateCardTitle}>{datePickerTitle}</Text>
               <IconSymbol
                 ios_icon_name="calendar"
                 android_material_icon_name="calendar-today"
@@ -353,7 +355,7 @@ export default function CounterScreen() {
                 />
               </View>
               <View style={styles.collapsedCenter}>
-                <Text style={styles.collapsedTitle}>תאריך תשלום אגרת היתר נהיגה</Text>
+                <Text style={styles.collapsedTitle}>{datePickerTitle}</Text>
                 <Text style={styles.collapsedDateValue}>{startDateDisplay}</Text>
               </View>
               <View style={styles.collapsedRight}>

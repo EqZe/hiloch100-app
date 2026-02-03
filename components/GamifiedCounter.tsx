@@ -70,7 +70,7 @@ export default function GamifiedCounter({
 
   const getMotivationalText = () => {
     if (currentStage === 'completed') {
-      return 'כל הכבוד! סיימת את תקופת הליווי';
+      return 'שמחים שעזרנו לך לעבור טסט - הילוך מאה';
     }
     if (currentProgress < 25) {
       return 'התחלה מצוינת! המשך כך';
@@ -146,6 +146,9 @@ export default function GamifiedCounter({
   // Check if fully completed: 0 days left and both stages done
   const isFullyCompleted = currentRemaining === 0 && stage1Remaining === 0 && stage2Remaining === 0;
 
+  const completionTitle = 'סיימת מלווה!';
+  const completionSubtitle = 'תהנה עם הרישיון';
+
   return (
     <View style={styles.container}>
       <View style={[styles.mainCircleContainer, { width: circleSize, height: circleSize }]}>
@@ -169,9 +172,8 @@ export default function GamifiedCounter({
             <View style={styles.mainCircleContent}>
               {isFullyCompleted ? (
                 <View style={styles.completionContainer}>
-                  <Text style={styles.completionTitle}>סיימת מלווה!</Text>
-                  <Text style={styles.completionSubtitle}>תהנה עם הרישיון</Text>
-                  <Text style={styles.completionBrand}>מהילוך מאה</Text>
+                  <Text style={styles.completionTitle}>{completionTitle}</Text>
+                  <Text style={styles.completionSubtitle}>{completionSubtitle}</Text>
                 </View>
               ) : (
                 <>
@@ -208,9 +210,8 @@ export default function GamifiedCounter({
             <View style={styles.mainCircleContent}>
               {isFullyCompleted ? (
                 <View style={styles.completionContainer}>
-                  <Text style={styles.completionTitle}>סיימת מלווה!</Text>
-                  <Text style={styles.completionSubtitle}>תהנה עם הרישיון</Text>
-                  <Text style={styles.completionBrand}>מהילוך מאה</Text>
+                  <Text style={styles.completionTitle}>{completionTitle}</Text>
+                  <Text style={styles.completionSubtitle}>{completionSubtitle}</Text>
                 </View>
               ) : (
                 <>
@@ -346,13 +347,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: colors.text,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  completionBrand: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.textSecondary,
     textAlign: 'center',
   },
   nextStageNote: {
