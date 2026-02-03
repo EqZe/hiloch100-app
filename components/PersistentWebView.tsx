@@ -13,7 +13,7 @@ I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
 export default function PersistentWebView() {
-  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied } = useWebView();
+  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted } = useWebView();
   const pathname = usePathname();
   
   const isVisible = pathname === '/(tabs)/course' || pathname === '/course';
@@ -43,18 +43,20 @@ export default function PersistentWebView() {
         if (mobileAppParam === 'denied') {
           console.log('PersistentWebView: Access DENIED - mobileapp=denied detected - BLOCKING ENTIRE APP INCLUDING NAVBAR');
           setShowAccessDenied(true);
+          setAccessGranted(false);
           return; // Block further navigation/checks
         } else if (mobileAppParam === 'granted') {
-          console.log('PersistentWebView: Access GRANTED - mobileapp=granted detected');
+          console.log('PersistentWebView: Access GRANTED - mobileapp=granted detected - SHOWING NAVBAR');
           setShowAccessDenied(false);
+          setAccessGranted(true); // Mark access as granted - navbar will now show and stay shown
         } else {
-          console.log('PersistentWebView: No mobileapp parameter or invalid value');
+          console.log('PersistentWebView: No mobileapp parameter or invalid value - navbar remains hidden until granted');
         }
       } else {
-        console.log('PersistentWebView: No URL parameters found');
+        console.log('PersistentWebView: No URL parameters found - navbar remains hidden until granted');
       }
     }
-  }, [setShowAccessDenied]);
+  }, [setShowAccessDenied, setAccessGranted]);
 
   const handleLoadStart = () => {
     console.log('PersistentWebView: Load started');

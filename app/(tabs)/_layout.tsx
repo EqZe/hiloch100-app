@@ -5,7 +5,7 @@ import FloatingTabBar, { TabBarItem } from '@/components/FloatingTabBar';
 import { WebViewProvider, useWebView } from '@/contexts/WebViewContext';
 
 function TabLayoutContent() {
-  const { showAccessDenied } = useWebView();
+  const { showAccessDenied, accessGranted } = useWebView();
 
   const tabs: TabBarItem[] = [
     {
@@ -22,7 +22,13 @@ function TabLayoutContent() {
     },
   ];
 
-  console.log('TabLayout: showAccessDenied state:', showAccessDenied, '- Navbar will be', showAccessDenied ? 'HIDDEN' : 'VISIBLE');
+  // Navbar visibility logic:
+  // - Hide if access is denied (showAccessDenied = true)
+  // - Hide if access has NOT been granted yet (accessGranted = false)
+  // - Show only when accessGranted = true AND showAccessDenied = false
+  const shouldShowNavbar = accessGranted && !showAccessDenied;
+
+  console.log('TabLayout: accessGranted:', accessGranted, 'showAccessDenied:', showAccessDenied, '- Navbar will be', shouldShowNavbar ? 'VISIBLE' : 'HIDDEN');
 
   return (
     <>
@@ -35,8 +41,8 @@ function TabLayoutContent() {
         <Stack.Screen key="course" name="course" />
         <Stack.Screen key="counter" name="counter" />
       </Stack>
-      {/* Only render FloatingTabBar when access is NOT denied */}
-      {!showAccessDenied && <FloatingTabBar tabs={tabs} />}
+      {/* Only render FloatingTabBar when access is granted and not denied */}
+      {shouldShowNavbar && <FloatingTabBar tabs={tabs} />}
     </>
   );
 }
