@@ -1,14 +1,19 @@
 
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
-import { WebView } from 'react-native-webview';
+import React, { useEffect, useCallback } from 'react';
+import { View, StyleSheet, Platform, Text, TouchableOpacity, Linking, I18nManager } from 'react-native';
+import { WebView, WebViewNavigation } from 'react-native-webview';
 import { useWebView } from '@/contexts/WebViewContext';
 import { colors } from '@/styles/commonStyles';
 import LottieView from 'lottie-react-native';
 import { usePathname } from 'expo-router';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+
+// Enable RTL support for Hebrew
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
 
 export default function PersistentWebView() {
-  const { webViewRef, isLoading, setIsLoading } = useWebView();
+  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied } = useWebView();
   const pathname = usePathname();
   
   const isVisible = pathname === '/(tabs)/course' || pathname === '/course';
@@ -16,6 +21,40 @@ export default function PersistentWebView() {
   useEffect(() => {
     console.log('PersistentWebView: Current pathname:', pathname, 'Visible:', isVisible);
   }, [pathname, isVisible]);
+
+  const handleNavigationStateChange = useCallback((navState: WebViewNavigation) => {
+    const currentUrl = navState.url;
+    console.log('PersistentWebView: Navigation state changed to:', currentUrl);
+    
+    const isCourseUrl = currentUrl.includes('/course');
+
+    // Parameter Check Logic - PRIORITY CHECK
+    if (isCourseUrl) {
+      console.log('PersistentWebView: Detected /course URL, checking mobileapp parameter...');
+      
+      // Parse URL parameters
+      const urlParts = currentUrl.split('?');
+      if (urlParts.length > 1) {
+        const urlParams = new URLSearchParams(urlParts[1]);
+        const mobileAppParam = urlParams.get('mobileapp');
+        
+        console.log('PersistentWebView: mobileapp parameter value:', mobileAppParam);
+
+        if (mobileAppParam === 'denied') {
+          console.log('PersistentWebView: Access DENIED - mobileapp=denied detected');
+          setShowAccessDenied(true);
+          return; // Block further navigation/checks
+        } else if (mobileAppParam === 'granted') {
+          console.log('PersistentWebView: Access GRANTED - mobileapp=granted detected');
+          setShowAccessDenied(false);
+        } else {
+          console.log('PersistentWebView: No mobileapp parameter or invalid value');
+        }
+      } else {
+        console.log('PersistentWebView: No URL parameters found');
+      }
+    }
+  }, [setShowAccessDenied]);
 
   const handleLoadStart = () => {
     console.log('PersistentWebView: Load started');
@@ -33,20 +72,42 @@ export default function PersistentWebView() {
     setIsLoading(false);
   };
 
+  const handleContactTeam = useCallback(() => {
+    const whatsappUrl = 'https://wa.me/9720584422101?text=%E2%80%8E%20%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3%20%D7%AA%D7%95%D7%9B%D7%9F%20%D7%9C%D7%97%D7%91%D7%99%D7%9C%D7%AA%20%D7%94%D7%94%D7%9B%D7%A0%D7%94%20%D7%9C%D7%98%D7%A1%D7%98%20%D7%A9%D7%9C%D7%99';
+    console.log('PersistentWebView: Opening WhatsApp contact link');
+    Linking.openURL(whatsappUrl).catch(err => {
+      console.error('PersistentWebView: Failed to open WhatsApp link:', err);
+    });
+  }, []);
+
+  const titleText = 'אינך זכאי להשתמש באפליקציית המובייל של הילוך מאה';
+  const subtitleText = 'ניתן לפנות לצוות האתר לצורך שדרוג החבילה';
+  const buttonText = 'צור קשר עם הצוות';
+
   return (
     <View style={[styles.container, !isVisible && styles.hidden]}>
-      <WebView
-        ref={webViewRef}
-        source={{ uri: 'https://hiloch100.co.il/course' }}
-        style={styles.webview}
-        onLoadStart={handleLoadStart}
-        onLoadEnd={handleLoadEnd}
-        onError={handleError}
-        onLoad={() => {
-          console.log('PersistentWebView: WebView loaded successfully');
-        }}
-      />
-      {isLoading && (
+      {/* WebView - hidden when access is denied */}
+      <View style={[styles.webviewContainer, showAccessDenied && styles.webviewHidden]}>
+        <WebView
+          ref={webViewRef}
+          source={{ uri: 'https://hiloch100.co.il/course' }}
+          style={styles.webview}
+          onLoadStart={handleLoadStart}
+          onLoadEnd={handleLoadEnd}
+          onError={handleError}
+          onNavigationStateChange={handleNavigationStateChange}
+          onLoad={() => {
+            console.log('PersistentWebView: WebView loaded successfully');
+          }}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          sharedCookiesEnabled={true}
+          thirdPartyCookiesEnabled={true}
+        />
+      </View>
+
+      {/* Loading Indicator */}
+      {isLoading && !showAccessDenied && (
         <View style={styles.loadingContainer}>
           <LottieView
             source={{ uri: 'https://hiloch100.co.il/Speedometer.json' }}
@@ -54,6 +115,31 @@ export default function PersistentWebView() {
             loop
             style={styles.lottie}
           />
+        </View>
+      )}
+
+      {/* Access Denied Overlay - Persistent and Blocking */}
+      {showAccessDenied && (
+        <View style={styles.accessDeniedOverlay}>
+          <View style={styles.accessDeniedContent}>
+            {/* Red Block Icon */}
+            <MaterialIcons name="block" size={120} color="#DC2626" style={styles.accessDeniedIcon} />
+            
+            {/* Title */}
+            <Text style={styles.accessDeniedTitle}>{titleText}</Text>
+            
+            {/* Subtitle */}
+            <Text style={styles.accessDeniedSubtitle}>{subtitleText}</Text>
+            
+            {/* Contact Button */}
+            <TouchableOpacity
+              style={styles.contactButton}
+              onPress={handleContactTeam}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.contactButtonText}>{buttonText}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
@@ -70,6 +156,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   hidden: {
+    opacity: 0,
+    pointerEvents: 'none',
+  },
+  webviewContainer: {
+    flex: 1,
+  },
+  webviewHidden: {
     opacity: 0,
     pointerEvents: 'none',
   },
@@ -90,5 +183,67 @@ const styles = StyleSheet.create({
   lottie: {
     width: 200,
     height: 200,
+  },
+  // Access Denied Overlay Styles
+  accessDeniedOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+  },
+  accessDeniedContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+    maxWidth: 500,
+  },
+  accessDeniedIcon: {
+    marginBottom: 32,
+  },
+  accessDeniedTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 32,
+    writingDirection: 'rtl',
+  },
+  accessDeniedSubtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 40,
+    lineHeight: 24,
+    writingDirection: 'rtl',
+  },
+  contactButton: {
+    backgroundColor: '#3B82F6',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    minWidth: 250,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  contactButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    writingDirection: 'rtl',
   },
 });
