@@ -9,6 +9,7 @@ import {
   Platform,
   Modal,
   I18nManager,
+  TextInput,
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { colors } from '@/styles/commonStyles';
@@ -273,21 +274,15 @@ export default function ExpensesScreen() {
               <Text style={styles.inputLabel}>סכום</Text>
               <View style={styles.amountInputWrapper}>
                 <Text style={styles.currencySymbol}>₪</Text>
-                <TouchableOpacity
-                  style={styles.amountInput}
-                  onPress={() => {
-                    // Simple numeric input using prompt-like approach
-                    const newAmount = prompt('הכנס סכום:');
-                    if (newAmount) {
-                      setAmount(newAmount);
-                    }
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={amount ? styles.amountInputTextFilled : styles.amountInputText}>
-                    {amount || '0.00'}
-                  </Text>
-                </TouchableOpacity>
+                <TextInput
+                  style={styles.amountTextInput}
+                  value={amount}
+                  onChangeText={setAmount}
+                  placeholder="0.00"
+                  placeholderTextColor={colors.textSecondary}
+                  keyboardType="decimal-pad"
+                  returnKeyType="done"
+                />
               </View>
             </View>
 
@@ -601,15 +596,9 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginRight: 8,
   },
-  amountInput: {
+  amountTextInput: {
     flex: 1,
     paddingVertical: 16,
-  },
-  amountInputText: {
-    fontSize: 16,
-    color: colors.textSecondary,
-  },
-  amountInputTextFilled: {
     fontSize: 16,
     color: colors.text,
     fontWeight: '500',
