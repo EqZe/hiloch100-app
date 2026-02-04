@@ -34,6 +34,11 @@ const EXPENSE_TYPES = [
   'שיעור נהיגה כפול',
   'אגרה לאחר מעבר טסט',
   'אגרת טסט פנימי',
+  'טופס ירוק',
+  'בדיקת ראייה',
+  'דמי החלפה',
+  'הילוך מאה - הכנה לטסט',
+  'קורס הכנה לתיאוריה',
 ];
 
 interface Expense {
@@ -320,8 +325,19 @@ export default function ExpensesScreen() {
             setShowEditModal(false);
           }}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => {
+              setShowAddModal(false);
+              setShowEditModal(false);
+            }}
+          >
+            <TouchableOpacity
+              style={styles.modalContent}
+              activeOpacity={1}
+              onPress={(e) => e.stopPropagation()}
+            >
               <Text style={styles.modalTitle}>
                 {editingExpense ? 'עריכת הוצאה' : 'הוספת הוצאה'}
               </Text>
@@ -403,12 +419,12 @@ export default function ExpensesScreen() {
                   <Text style={styles.cancelButtonText}>ביטול</Text>
                 </TouchableOpacity>
               </View>
-            </View>
-          </View>
+            </TouchableOpacity>
+          </TouchableOpacity>
         </Modal>
       )}
 
-      {/* Type Selection Modal */}
+      {/* Type Selection Modal - Rendered at root level */}
       {isTypeModalVisible && (
         <Modal
           visible={isTypeModalVisible}
@@ -416,10 +432,18 @@ export default function ExpensesScreen() {
           animationType="fade"
           onRequestClose={() => setShowTypeModal(false)}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.typeModalContent}>
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowTypeModal(false)}
+          >
+            <TouchableOpacity
+              style={styles.typeModalContent}
+              activeOpacity={1}
+              onPress={(e) => e.stopPropagation()}
+            >
               <Text style={styles.modalTitle}>בחר סוג הוצאה</Text>
-              <ScrollView style={styles.typeList}>
+              <ScrollView style={styles.typeList} showsVerticalScrollIndicator={false}>
                 {EXPENSE_TYPES.map((type, index) => (
                   <TouchableOpacity
                     key={index}
@@ -438,12 +462,12 @@ export default function ExpensesScreen() {
               >
                 <Text style={styles.cancelButtonText}>ביטול</Text>
               </TouchableOpacity>
-            </View>
-          </View>
+            </TouchableOpacity>
+          </TouchableOpacity>
         </Modal>
       )}
 
-      {/* Date Picker */}
+      {/* Date Picker - Rendered at root level */}
       {isDatePickerVisible && (
         <CustomDatePicker
           visible={isDatePickerVisible}
@@ -469,8 +493,16 @@ export default function ExpensesScreen() {
           animationType="fade"
           onRequestClose={() => setShowDeleteModal(false)}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.deleteModalContent}>
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowDeleteModal(false)}
+          >
+            <TouchableOpacity
+              style={styles.deleteModalContent}
+              activeOpacity={1}
+              onPress={(e) => e.stopPropagation()}
+            >
               <Text style={styles.modalTitle}>מחיקת הוצאה</Text>
               <Text style={styles.deleteModalText}>האם אתה בטוח שברצונך למחוק הוצאה זו?</Text>
               <View style={styles.modalButtons}>
@@ -489,8 +521,8 @@ export default function ExpensesScreen() {
                   <Text style={styles.cancelButtonText}>ביטול</Text>
                 </TouchableOpacity>
               </View>
-            </View>
-          </View>
+            </TouchableOpacity>
+          </TouchableOpacity>
         </Modal>
       )}
     </SafeAreaView>
