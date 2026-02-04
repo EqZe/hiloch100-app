@@ -115,6 +115,54 @@ export default function ExpensesScreen() {
     setShowTypeModal(false);
   }, []);
 
+  const handleOpenTypeModal = useCallback(() => {
+    console.log('Opening type selection modal');
+    // Close the add/edit modal first, then open type modal
+    setShowAddModal(false);
+    setShowEditModal(false);
+    // Use setTimeout to ensure the first modal is fully closed before opening the second
+    setTimeout(() => {
+      setShowTypeModal(true);
+    }, 100);
+  }, []);
+
+  const handleCloseTypeModal = useCallback(() => {
+    console.log('Closing type selection modal');
+    setShowTypeModal(false);
+    // Reopen the add/edit modal after type selection
+    setTimeout(() => {
+      if (editingExpense) {
+        setShowEditModal(true);
+      } else {
+        setShowAddModal(true);
+      }
+    }, 100);
+  }, [editingExpense]);
+
+  const handleOpenDatePicker = useCallback(() => {
+    console.log('Opening date picker');
+    // Close the add/edit modal first, then open date picker
+    setShowAddModal(false);
+    setShowEditModal(false);
+    // Use setTimeout to ensure the first modal is fully closed before opening the second
+    setTimeout(() => {
+      setShowDatePicker(true);
+    }, 100);
+  }, []);
+
+  const handleCloseDatePicker = useCallback(() => {
+    console.log('Closing date picker');
+    setShowDatePicker(false);
+    // Reopen the add/edit modal after date selection
+    setTimeout(() => {
+      if (editingExpense) {
+        setShowEditModal(true);
+      } else {
+        setShowAddModal(true);
+      }
+    }, 100);
+  }, [editingExpense]);
+
   const handleSaveExpense = useCallback(() => {
     console.log('Save button pressed - Type:', selectedType, 'Amount:', amount);
     
@@ -315,216 +363,175 @@ export default function ExpensesScreen() {
       </ScrollView>
 
       {/* Add/Edit Expense Modal */}
-      {(isAddModalVisible || isEditModalVisible) && (
-        <Modal
-          visible={isAddModalVisible || isEditModalVisible}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => {
-            setShowAddModal(false);
-            setShowEditModal(false);
-          }}
-        >
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPress={() => {
-              setShowAddModal(false);
-              setShowEditModal(false);
-            }}
-          >
+      <Modal
+        visible={isAddModalVisible || isEditModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => {
+          setShowAddModal(false);
+          setShowEditModal(false);
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              {editingExpense ? 'עריכת הוצאה' : 'הוספת הוצאה'}
+            </Text>
+
+            {/* Type Selection */}
             <TouchableOpacity
-              style={styles.modalContent}
-              activeOpacity={1}
-              onPress={(e) => e.stopPropagation()}
+              style={styles.inputButton}
+              onPress={handleOpenTypeModal}
+              activeOpacity={0.7}
             >
-              <Text style={styles.modalTitle}>
-                {editingExpense ? 'עריכת הוצאה' : 'הוספת הוצאה'}
+              <IconSymbol
+                ios_icon_name="chevron.down"
+                android_material_icon_name="arrow-drop-down"
+                size={24}
+                color={colors.textSecondary}
+              />
+              <Text style={selectedType ? styles.inputButtonTextSelected : styles.inputButtonText}>
+                {selectedType || 'בחר סוג הוצאה'}
               </Text>
-
-              {/* Type Selection */}
-              <TouchableOpacity
-                style={styles.inputButton}
-                onPress={() => {
-                  console.log('Opening type selection modal');
-                  setShowTypeModal(true);
-                }}
-                activeOpacity={0.7}
-              >
-                <IconSymbol
-                  ios_icon_name="chevron.down"
-                  android_material_icon_name="arrow-drop-down"
-                  size={24}
-                  color={colors.textSecondary}
-                />
-                <Text style={selectedType ? styles.inputButtonTextSelected : styles.inputButtonText}>
-                  {selectedType || 'בחר סוג הוצאה'}
-                </Text>
-              </TouchableOpacity>
-
-              {/* Amount Input */}
-              <View style={styles.amountInputContainer}>
-                <Text style={styles.inputLabel}>סכום</Text>
-                <View style={styles.amountInputWrapper}>
-                  <TextInput
-                    style={styles.amountTextInput}
-                    value={amount}
-                    onChangeText={setAmount}
-                    placeholder="0.00"
-                    placeholderTextColor={colors.textSecondary}
-                    keyboardType="decimal-pad"
-                    returnKeyType="done"
-                    textAlign="right"
-                  />
-                  <Text style={styles.currencySymbol}>₪</Text>
-                </View>
-              </View>
-
-              {/* Date Selection */}
-              <TouchableOpacity
-                style={styles.inputButton}
-                onPress={() => {
-                  console.log('Opening date picker');
-                  setShowDatePicker(true);
-                }}
-                activeOpacity={0.7}
-              >
-                <IconSymbol
-                  ios_icon_name="calendar"
-                  android_material_icon_name="calendar-today"
-                  size={24}
-                  color={colors.textSecondary}
-                />
-                <Text style={styles.inputButtonTextSelected}>
-                  {formatDate(selectedDate.toISOString())}
-                </Text>
-              </TouchableOpacity>
-
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.saveButton]}
-                  onPress={handleSaveExpense}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.saveButtonText}>שמור</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.cancelButton]}
-                  onPress={() => {
-                    setShowAddModal(false);
-                    setShowEditModal(false);
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.cancelButtonText}>ביטול</Text>
-                </TouchableOpacity>
-              </View>
             </TouchableOpacity>
-          </TouchableOpacity>
-        </Modal>
-      )}
 
-      {/* Type Selection Modal - Rendered at root level */}
-      {isTypeModalVisible && (
-        <Modal
-          visible={isTypeModalVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setShowTypeModal(false)}
-        >
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPress={() => setShowTypeModal(false)}
-          >
+            {/* Amount Input */}
+            <View style={styles.amountInputContainer}>
+              <Text style={styles.inputLabel}>סכום</Text>
+              <View style={styles.amountInputWrapper}>
+                <TextInput
+                  style={styles.amountTextInput}
+                  value={amount}
+                  onChangeText={setAmount}
+                  placeholder="0.00"
+                  placeholderTextColor={colors.textSecondary}
+                  keyboardType="decimal-pad"
+                  returnKeyType="done"
+                  textAlign="right"
+                />
+                <Text style={styles.currencySymbol}>₪</Text>
+              </View>
+            </View>
+
+            {/* Date Selection */}
             <TouchableOpacity
-              style={styles.typeModalContent}
-              activeOpacity={1}
-              onPress={(e) => e.stopPropagation()}
+              style={styles.inputButton}
+              onPress={handleOpenDatePicker}
+              activeOpacity={0.7}
             >
-              <Text style={styles.modalTitle}>בחר סוג הוצאה</Text>
-              <ScrollView style={styles.typeList} showsVerticalScrollIndicator={false}>
-                {EXPENSE_TYPES.map((type, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.typeItem}
-                    onPress={() => handleSelectType(type)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.typeItemText}>{type}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+              <IconSymbol
+                ios_icon_name="calendar"
+                android_material_icon_name="calendar-today"
+                size={24}
+                color={colors.textSecondary}
+              />
+              <Text style={styles.inputButtonTextSelected}>
+                {formatDate(selectedDate.toISOString())}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton, { marginTop: 16 }]}
-                onPress={() => setShowTypeModal(false)}
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={handleSaveExpense}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.saveButtonText}>שמור</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => {
+                  setShowAddModal(false);
+                  setShowEditModal(false);
+                }}
                 activeOpacity={0.7}
               >
                 <Text style={styles.cancelButtonText}>ביטול</Text>
               </TouchableOpacity>
-            </TouchableOpacity>
-          </TouchableOpacity>
-        </Modal>
-      )}
+            </View>
+          </View>
+        </View>
+      </Modal>
 
-      {/* Date Picker - Rendered at root level */}
-      {isDatePickerVisible && (
-        <CustomDatePicker
-          visible={isDatePickerVisible}
-          onClose={() => {
-            console.log('Closing date picker');
-            setShowDatePicker(false);
-          }}
-          onSelectDate={(date) => {
-            console.log('Date selected:', date);
-            setSelectedDate(date);
-            setShowDatePicker(false);
-          }}
-          selectedDate={selectedDate}
-          maximumDate={new Date()}
-        />
-      )}
+      {/* Type Selection Modal - Separate from Add/Edit Modal */}
+      <Modal
+        visible={isTypeModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={handleCloseTypeModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.typeModalContent}>
+            <Text style={styles.modalTitle}>בחר סוג הוצאה</Text>
+            <ScrollView style={styles.typeList} showsVerticalScrollIndicator={false}>
+              {EXPENSE_TYPES.map((type, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.typeItem}
+                  onPress={() => {
+                    handleSelectType(type);
+                    handleCloseTypeModal();
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.typeItemText}>{type}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.cancelButton, { marginTop: 16 }]}
+              onPress={handleCloseTypeModal}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.cancelButtonText}>ביטול</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Date Picker - Separate from Add/Edit Modal */}
+      <CustomDatePicker
+        visible={isDatePickerVisible}
+        onClose={handleCloseDatePicker}
+        onSelectDate={(date) => {
+          console.log('Date selected:', date);
+          setSelectedDate(date);
+          handleCloseDatePicker();
+        }}
+        selectedDate={selectedDate}
+        maximumDate={new Date()}
+      />
 
       {/* Delete Confirmation Modal */}
-      {isDeleteModalVisible && (
-        <Modal
-          visible={isDeleteModalVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setShowDeleteModal(false)}
-        >
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPress={() => setShowDeleteModal(false)}
-          >
-            <TouchableOpacity
-              style={styles.deleteModalContent}
-              activeOpacity={1}
-              onPress={(e) => e.stopPropagation()}
-            >
-              <Text style={styles.modalTitle}>מחיקת הוצאה</Text>
-              <Text style={styles.deleteModalText}>האם אתה בטוח שברצונך למחוק הוצאה זו?</Text>
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.deleteButton]}
-                  onPress={confirmDelete}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.deleteButtonText}>מחק</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.cancelButton]}
-                  onPress={() => setShowDeleteModal(false)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.cancelButtonText}>ביטול</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          </TouchableOpacity>
-        </Modal>
-      )}
+      <Modal
+        visible={isDeleteModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowDeleteModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.deleteModalContent}>
+            <Text style={styles.modalTitle}>מחיקת הוצאה</Text>
+            <Text style={styles.deleteModalText}>האם אתה בטוח שברצונך למחוק הוצאה זו?</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.deleteButton]}
+                onPress={confirmDelete}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.deleteButtonText}>מחק</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowDeleteModal(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>ביטול</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
