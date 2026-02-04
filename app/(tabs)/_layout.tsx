@@ -20,6 +20,12 @@ function TabLayoutContent() {
       icon: 'calendar-today',
       label: 'ספירת ימים',
     },
+    {
+      name: 'expenses',
+      route: '/(tabs)/expenses',
+      icon: 'receipt',
+      label: 'הוצאות',
+    },
   ];
 
   // Navbar visibility logic:
@@ -40,6 +46,7 @@ function TabLayoutContent() {
       >
         <Stack.Screen key="course" name="course" />
         <Stack.Screen key="counter" name="counter" />
+        <Stack.Screen key="expenses" name="expenses" />
       </Stack>
       {/* Only render FloatingTabBar when access is granted and not denied */}
       {shouldShowNavbar && <FloatingTabBar tabs={tabs} />}
