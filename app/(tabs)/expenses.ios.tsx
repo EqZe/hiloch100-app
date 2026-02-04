@@ -17,6 +17,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { IconSymbol } from '@/components/IconSymbol';
 import CustomDatePicker from '@/components/CustomDatePicker';
 
+// Force RTL layout
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
+
 const STORAGE_KEY = 'driving_expenses';
 
 // Expense types in Hebrew
@@ -163,7 +167,6 @@ export default function ExpensesScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>מעקב הוצאות</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={handleAddExpense}
@@ -176,6 +179,7 @@ export default function ExpensesScreen() {
             color="#FFFFFF"
           />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>מעקב הוצאות</Text>
       </View>
 
       <View style={styles.summaryCard}>
@@ -208,7 +212,6 @@ export default function ExpensesScreen() {
               return (
                 <View key={index} style={styles.expenseCard}>
                   <View style={styles.expenseHeader}>
-                    <Text style={styles.expenseType}>{expense.type}</Text>
                     <TouchableOpacity
                       onPress={() => handleDeleteExpense(expense.id)}
                       activeOpacity={0.7}
@@ -221,18 +224,19 @@ export default function ExpensesScreen() {
                         color={colors.warning}
                       />
                     </TouchableOpacity>
+                    <Text style={styles.expenseType}>{expense.type}</Text>
                   </View>
                   <View style={styles.expenseDetails}>
+                    <Text style={styles.expenseAmount}>{expenseAmount}</Text>
                     <View style={styles.expenseDetailRow}>
+                      <Text style={styles.expenseDate}>{expenseDate}</Text>
                       <IconSymbol
                         ios_icon_name="calendar"
                         android_material_icon_name="calendar-today"
                         size={16}
                         color={colors.textSecondary}
                       />
-                      <Text style={styles.expenseDate}>{expenseDate}</Text>
                     </View>
-                    <Text style={styles.expenseAmount}>{expenseAmount}</Text>
                   </View>
                 </View>
               );
@@ -255,25 +259,27 @@ export default function ExpensesScreen() {
             {/* Type Selection */}
             <TouchableOpacity
               style={styles.inputButton}
-              onPress={() => setShowTypeModal(true)}
+              onPress={() => {
+                console.log('Opening type selection modal');
+                setShowTypeModal(true);
+              }}
               activeOpacity={0.7}
             >
-              <Text style={selectedType ? styles.inputButtonTextSelected : styles.inputButtonText}>
-                {selectedType || 'בחר סוג הוצאה'}
-              </Text>
               <IconSymbol
                 ios_icon_name="chevron.down"
                 android_material_icon_name="arrow-drop-down"
                 size={24}
                 color={colors.textSecondary}
               />
+              <Text style={selectedType ? styles.inputButtonTextSelected : styles.inputButtonText}>
+                {selectedType || 'בחר סוג הוצאה'}
+              </Text>
             </TouchableOpacity>
 
             {/* Amount Input */}
             <View style={styles.amountInputContainer}>
               <Text style={styles.inputLabel}>סכום</Text>
               <View style={styles.amountInputWrapper}>
-                <Text style={styles.currencySymbol}>₪</Text>
                 <TextInput
                   style={styles.amountTextInput}
                   value={amount}
@@ -282,35 +288,33 @@ export default function ExpensesScreen() {
                   placeholderTextColor={colors.textSecondary}
                   keyboardType="decimal-pad"
                   returnKeyType="done"
+                  textAlign="right"
                 />
+                <Text style={styles.currencySymbol}>₪</Text>
               </View>
             </View>
 
             {/* Date Selection */}
             <TouchableOpacity
               style={styles.inputButton}
-              onPress={() => setShowDatePicker(true)}
+              onPress={() => {
+                console.log('Opening date picker');
+                setShowDatePicker(true);
+              }}
               activeOpacity={0.7}
             >
-              <Text style={styles.inputButtonTextSelected}>
-                {formatDate(selectedDate.toISOString())}
-              </Text>
               <IconSymbol
                 ios_icon_name="calendar"
                 android_material_icon_name="calendar-today"
                 size={24}
                 color={colors.textSecondary}
               />
+              <Text style={styles.inputButtonTextSelected}>
+                {formatDate(selectedDate.toISOString())}
+              </Text>
             </TouchableOpacity>
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowAddModal(false)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.cancelButtonText}>ביטול</Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.saveButton]}
                 onPress={handleSaveExpense}
@@ -318,55 +322,78 @@ export default function ExpensesScreen() {
               >
                 <Text style={styles.saveButtonText}>שמור</Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowAddModal(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>ביטול</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
 
-      {/* Type Selection Modal */}
-      <Modal
-        visible={showTypeModal}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowTypeModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.typeModalContent}>
-            <Text style={styles.modalTitle}>בחר סוג הוצאה</Text>
-            <ScrollView style={styles.typeList}>
-              {EXPENSE_TYPES.map((type, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.typeItem}
-                  onPress={() => handleSelectType(type)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.typeItemText}>{type}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+      {/* Type Selection Modal - Rendered separately with higher z-index */}
+      {showTypeModal && (
+        <Modal
+          visible={showTypeModal}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowTypeModal(false)}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowTypeModal(false)}
+          >
             <TouchableOpacity
-              style={[styles.modalButton, styles.cancelButton]}
-              onPress={() => setShowTypeModal(false)}
-              activeOpacity={0.7}
+              style={styles.typeModalContent}
+              activeOpacity={1}
+              onPress={(e) => e.stopPropagation()}
             >
-              <Text style={styles.cancelButtonText}>ביטול</Text>
+              <Text style={styles.modalTitle}>בחר סוג הוצאה</Text>
+              <ScrollView style={styles.typeList}>
+                {EXPENSE_TYPES.map((type, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.typeItem}
+                    onPress={() => handleSelectType(type)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.typeItemText}>{type}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton, { marginTop: 16 }]}
+                onPress={() => setShowTypeModal(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>ביטול</Text>
+              </TouchableOpacity>
             </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+          </TouchableOpacity>
+        </Modal>
+      )}
 
-      {/* Date Picker */}
-      <CustomDatePicker
-        visible={showDatePicker}
-        onClose={() => setShowDatePicker(false)}
-        onSelectDate={(date) => {
-          setSelectedDate(date);
-          setShowDatePicker(false);
-        }}
-        selectedDate={selectedDate}
-        maximumDate={new Date()}
-      />
+      {/* Date Picker - Rendered separately with higher z-index */}
+      {showDatePicker && (
+        <CustomDatePicker
+          visible={showDatePicker}
+          onClose={() => {
+            console.log('Closing date picker');
+            setShowDatePicker(false);
+          }}
+          onSelectDate={(date) => {
+            console.log('Date selected:', date);
+            setSelectedDate(date);
+            setShowDatePicker(false);
+          }}
+          selectedDate={selectedDate}
+          maximumDate={new Date()}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       <Modal
@@ -381,18 +408,18 @@ export default function ExpensesScreen() {
             <Text style={styles.deleteModalText}>האם אתה בטוח שברצונך למחוק הוצאה זו?</Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowDeleteModal(false)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.cancelButtonText}>ביטול</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
                 style={[styles.modalButton, styles.deleteButton]}
                 onPress={confirmDelete}
                 activeOpacity={0.7}
               >
                 <Text style={styles.deleteButtonText}>מחק</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowDeleteModal(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>ביטול</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -421,6 +448,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: colors.text,
+    textAlign: 'right',
   },
   addButton: {
     backgroundColor: colors.primary,
@@ -454,11 +482,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.textSecondary,
     marginBottom: 8,
+    textAlign: 'center',
   },
   summaryAmount: {
     fontSize: 32,
     fontWeight: '700',
     color: colors.primary,
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,
@@ -477,11 +507,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     marginTop: 16,
+    textAlign: 'center',
   },
   emptySubtext: {
     fontSize: 14,
     color: colors.textSecondary,
     marginTop: 8,
+    textAlign: 'center',
   },
   expenseCard: {
     backgroundColor: colors.card,
@@ -507,6 +539,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     flex: 1,
+    textAlign: 'right',
   },
   expenseDetails: {
     flexDirection: 'row',
@@ -521,11 +554,13 @@ const styles = StyleSheet.create({
   expenseDate: {
     fontSize: 14,
     color: colors.textSecondary,
+    textAlign: 'right',
   },
   expenseAmount: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.primary,
+    textAlign: 'left',
   },
   modalOverlay: {
     flex: 1,
@@ -567,11 +602,15 @@ const styles = StyleSheet.create({
   inputButtonText: {
     fontSize: 16,
     color: colors.textSecondary,
+    textAlign: 'right',
+    flex: 1,
   },
   inputButtonTextSelected: {
     fontSize: 16,
     color: colors.text,
     fontWeight: '500',
+    textAlign: 'right',
+    flex: 1,
   },
   amountInputContainer: {
     marginBottom: 16,
@@ -580,6 +619,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
     marginBottom: 8,
+    textAlign: 'right',
   },
   amountInputWrapper: {
     flexDirection: 'row',
@@ -594,7 +634,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: colors.text,
-    marginRight: 8,
+    marginLeft: 8,
   },
   amountTextInput: {
     flex: 1,
@@ -642,18 +682,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 16,
     padding: 24,
-    width: '100%',
+    width: '90%',
     maxWidth: 400,
     maxHeight: '80%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 16,
-    elevation: 8,
+    elevation: 10,
   },
   typeList: {
     maxHeight: 400,
-    marginBottom: 16,
   },
   typeItem: {
     paddingVertical: 16,
@@ -664,6 +703,7 @@ const styles = StyleSheet.create({
   typeItemText: {
     fontSize: 16,
     color: colors.text,
+    textAlign: 'right',
   },
   deleteModalContent: {
     backgroundColor: colors.card,
