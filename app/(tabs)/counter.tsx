@@ -28,6 +28,7 @@ export default function CounterScreen() {
   const [stage1Expanded, setStage1Expanded] = useState(true);
   const [stage2Expanded, setStage2Expanded] = useState(true);
   const [datePickerExpanded, setDatePickerExpanded] = useState(true);
+  const [viewMode, setViewMode] = useState<'stages' | 'total'>('stages');
   const [calculatedDates, setCalculatedDates] = useState<{
     threeMonths: Date;
     sixMonths: Date;
@@ -41,7 +42,7 @@ export default function CounterScreen() {
     isToday: boolean;
   } | null>(null);
 
-  console.log('CounterScreen: Component rendered');
+  console.log('CounterScreen: Component rendered, viewMode:', viewMode);
 
   useEffect(() => {
     loadStartDate();
@@ -221,6 +222,12 @@ export default function CounterScreen() {
     );
   };
 
+  const handleToggleView = () => {
+    console.log('User toggled view mode from', viewMode, 'to', viewMode === 'stages' ? 'total' : 'stages');
+    const newMode = viewMode === 'stages' ? 'total' : 'stages';
+    setViewMode(newMode);
+  };
+
   const startDateDisplay = startDate ? formatDate(startDate) : 'בחר תאריך';
   const threeMonthsDisplay = calculatedDates ? formatDate(calculatedDates.threeMonths) : '-';
   const sixMonthsDisplay = calculatedDates ? formatDate(calculatedDates.sixMonths) : '-';
@@ -243,6 +250,18 @@ export default function CounterScreen() {
     return stage1Completed + stage2Completed;
   };
 
+  const getTotalDaysRemaining = () => {
+    if (!calculatedDates) return 0;
+    return calculatedDates.stage1Remaining + calculatedDates.stage2Remaining;
+  };
+
+  const getTotalProgress = () => {
+    if (!calculatedDates) return 0;
+    const totalDays = calculatedDates.stage1Total + calculatedDates.stage2Total;
+    const totalCompleted = getTotalDaysCompleted();
+    return (totalCompleted / totalDays) * 100;
+  };
+
   const getCurrentEndDate = () => {
     if (!calculatedDates) return '';
     if (calculatedDates.currentStage === 1) {
@@ -254,6 +273,9 @@ export default function CounterScreen() {
   };
 
   const datePickerTitle = 'תשלום אגרת היתר נהיגה';
+
+  const stagesButtonText = 'שלבים';
+  const totalButtonText = 'סה"כ';
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -372,221 +394,331 @@ export default function CounterScreen() {
 
         {calculatedDates && (
           <>
-            <GamifiedCounter
-              currentStage={calculatedDates.currentStage}
-              stage1Remaining={calculatedDates.stage1Remaining}
-              stage2Remaining={calculatedDates.stage2Remaining}
-              stage1Total={calculatedDates.stage1Total}
-              stage2Total={calculatedDates.stage2Total}
-              totalDaysCompleted={getTotalDaysCompleted()}
-              endDate={getCurrentEndDate()}
-            />
-
-            <View style={styles.stagesContainer}>
-              {isStage1Completed && !stage1Expanded ? (
-                <TouchableOpacity
-                  style={styles.stageCardCollapsed}
-                  onPress={() => {
-                    console.log('User tapped to expand Stage 1');
-                    setStage1Expanded(true);
-                  }}
+            <View style={styles.toggleContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.toggleButton,
+                  viewMode === 'stages' && styles.toggleButtonActive,
+                ]}
+                onPress={handleToggleView}
+              >
+                <Text
+                  style={[
+                    styles.toggleButtonText,
+                    viewMode === 'stages' && styles.toggleButtonTextActive,
+                  ]}
                 >
-                  <View style={styles.collapsedContent}>
-                    <View style={styles.collapsedLeft}>
-                      <IconSymbol
-                        ios_icon_name="checkmark.circle.fill"
-                        android_material_icon_name="check-circle"
-                        size={28}
-                        color="#4CAF50"
-                      />
-                    </View>
-                    <View style={styles.collapsedCenter}>
-                      <Text style={styles.collapsedTitle}>שלב 1 - מלווה</Text>
-                      <Text style={styles.collapsedStatus}>הסתיים</Text>
-                    </View>
-                    <View style={styles.collapsedRight}>
-                      <IconSymbol
-                        ios_icon_name="chevron.down"
-                        android_material_icon_name="expand-more"
-                        size={24}
-                        color={colors.textSecondary}
-                      />
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ) : (
-                <View style={[
-                  styles.stageCard,
-                  calculatedDates.currentStage === 1 && styles.stageCardActive,
-                  isStage1Completed && styles.stageCardCompleted
-                ]}>
-                  <View style={styles.stageHeader}>
-                    <View style={styles.stageTitleContainer}>
-                      <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
-                      <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
-                    </View>
-                    <View style={styles.stageIconContainer}>
-                      <IconSymbol
-                        ios_icon_name="person.fill"
-                        android_material_icon_name="person"
-                        size={28}
-                        color={calculatedDates.currentStage === 1 ? '#4FC3F7' : isStage1Completed ? '#4CAF50' : '#8E8E93'}
-                      />
-                    </View>
-                  </View>
-
-                  <View style={styles.requirementBox}>
-                    <Text style={styles.requirementText}>חובת ליווי 24/7</Text>
-                  </View>
-
-                  <View style={styles.progressContainer}>
-                    <View style={styles.progressBar}>
-                      <View style={[styles.progressFill, { width: `${stage1Progress}%`, backgroundColor: isStage1Completed ? '#4CAF50' : '#4FC3F7' }]} />
-                    </View>
-                    <Text style={styles.progressText}>
-                      {Math.round(stage1Progress)}%
-                    </Text>
-                  </View>
-
-                  <View style={styles.stageDetails}>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>ימים שנותרו</Text>
-                      <Text style={styles.detailValue}>{calculatedDates.stage1Remaining}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>תאריך סיום</Text>
-                      <Text style={styles.detailValue}>{threeMonthsDisplay}</Text>
-                    </View>
-                  </View>
-
-                  {calculatedDates.currentStage === 1 && (
-                    <View style={styles.currentBadge}>
-                      <Text style={styles.currentBadgeText}>שלב נוכחי</Text>
-                    </View>
-                  )}
-
-                  {isStage1Completed && (
-                    <TouchableOpacity
-                      style={styles.collapseButton}
-                      onPress={() => {
-                        console.log('User tapped to collapse Stage 1');
-                        setStage1Expanded(false);
-                      }}
-                    >
-                      <Text style={styles.collapseButtonText}>כווץ</Text>
-                      <IconSymbol
-                        ios_icon_name="chevron.up"
-                        android_material_icon_name="expand-less"
-                        size={18}
-                        color={colors.textSecondary}
-                      />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )}
-
-              {isStage2Completed && !stage2Expanded ? (
-                <TouchableOpacity
-                  style={styles.stageCardCollapsed}
-                  onPress={() => {
-                    console.log('User tapped to expand Stage 2');
-                    setStage2Expanded(true);
-                  }}
+                  {stagesButtonText}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.toggleButton,
+                  viewMode === 'total' && styles.toggleButtonActive,
+                ]}
+                onPress={handleToggleView}
+              >
+                <Text
+                  style={[
+                    styles.toggleButtonText,
+                    viewMode === 'total' && styles.toggleButtonTextActive,
+                  ]}
                 >
-                  <View style={styles.collapsedContent}>
-                    <View style={styles.collapsedLeft}>
-                      <IconSymbol
-                        ios_icon_name="checkmark.circle.fill"
-                        android_material_icon_name="check-circle"
-                        size={28}
-                        color="#4CAF50"
-                      />
-                    </View>
-                    <View style={styles.collapsedCenter}>
-                      <Text style={styles.collapsedTitle}>שלב 2 - מלווה לילה</Text>
-                      <Text style={styles.collapsedStatus}>הסתיים</Text>
-                    </View>
-                    <View style={styles.collapsedRight}>
-                      <IconSymbol
-                        ios_icon_name="chevron.down"
-                        android_material_icon_name="expand-more"
-                        size={24}
-                        color={colors.textSecondary}
-                      />
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ) : (
-                <View style={[
-                  styles.stageCard,
-                  calculatedDates.currentStage === 2 && styles.stageCardActive,
-                  isStage2Completed && styles.stageCardCompleted
-                ]}>
-                  <View style={styles.stageHeader}>
-                    <View style={styles.stageTitleContainer}>
-                      <Text style={styles.stageTitle}>שלב 2 - מלווה לילה</Text>
-                      <Text style={styles.stageSubtitle}>3 חודשים נוספים</Text>
-                    </View>
-                    <View style={styles.stageIconContainer}>
-                      <IconSymbol
-                        ios_icon_name="moon.fill"
-                        android_material_icon_name="nightlight"
-                        size={28}
-                        color={calculatedDates.currentStage === 2 ? '#4FC3F7' : isStage2Completed ? '#4CAF50' : '#8E8E93'}
-                      />
-                    </View>
-                  </View>
-
-                  <View style={styles.requirementBox}>
-                    <Text style={styles.requirementText}>חובת ליווי בין 21:00 ל-6:00 בלבד.</Text>
-                  </View>
-
-                  <View style={styles.progressContainer}>
-                    <View style={styles.progressBar}>
-                      <View style={[styles.progressFill, { width: `${stage2Progress}%`, backgroundColor: isStage2Completed ? '#4CAF50' : '#4FC3F7' }]} />
-                    </View>
-                    <Text style={styles.progressText}>
-                      {Math.round(stage2Progress)}%
-                    </Text>
-                  </View>
-
-                  <View style={styles.stageDetails}>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>ימים שנותרו</Text>
-                      <Text style={styles.detailValue}>{calculatedDates.stage2Remaining}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>תאריך סיום</Text>
-                      <Text style={styles.detailValue}>{sixMonthsDisplay}</Text>
-                    </View>
-                  </View>
-
-                  {calculatedDates.currentStage === 2 && (
-                    <View style={styles.currentBadge}>
-                      <Text style={styles.currentBadgeText}>שלב נוכחי</Text>
-                    </View>
-                  )}
-
-                  {isStage2Completed && (
-                    <TouchableOpacity
-                      style={styles.collapseButton}
-                      onPress={() => {
-                        console.log('User tapped to collapse Stage 2');
-                        setStage2Expanded(false);
-                      }}
-                    >
-                      <Text style={styles.collapseButtonText}>כווץ</Text>
-                      <IconSymbol
-                        ios_icon_name="chevron.up"
-                        android_material_icon_name="expand-less"
-                        size={18}
-                        color={colors.textSecondary}
-                      />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )}
+                  {totalButtonText}
+                </Text>
+              </TouchableOpacity>
             </View>
+
+            {viewMode === 'stages' ? (
+              <>
+                <GamifiedCounter
+                  currentStage={calculatedDates.currentStage}
+                  stage1Remaining={calculatedDates.stage1Remaining}
+                  stage2Remaining={calculatedDates.stage2Remaining}
+                  stage1Total={calculatedDates.stage1Total}
+                  stage2Total={calculatedDates.stage2Total}
+                  totalDaysCompleted={getTotalDaysCompleted()}
+                  endDate={getCurrentEndDate()}
+                />
+
+                <View style={styles.stagesContainer}>
+                  {isStage1Completed && !stage1Expanded ? (
+                    <TouchableOpacity
+                      style={styles.stageCardCollapsed}
+                      onPress={() => {
+                        console.log('User tapped to expand Stage 1');
+                        setStage1Expanded(true);
+                      }}
+                    >
+                      <View style={styles.collapsedContent}>
+                        <View style={styles.collapsedLeft}>
+                          <IconSymbol
+                            ios_icon_name="checkmark.circle.fill"
+                            android_material_icon_name="check-circle"
+                            size={28}
+                            color="#4CAF50"
+                          />
+                        </View>
+                        <View style={styles.collapsedCenter}>
+                          <Text style={styles.collapsedTitle}>שלב 1 - מלווה</Text>
+                          <Text style={styles.collapsedStatus}>הסתיים</Text>
+                        </View>
+                        <View style={styles.collapsedRight}>
+                          <IconSymbol
+                            ios_icon_name="chevron.down"
+                            android_material_icon_name="expand-more"
+                            size={24}
+                            color={colors.textSecondary}
+                          />
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  ) : (
+                    <View style={[
+                      styles.stageCard,
+                      calculatedDates.currentStage === 1 && styles.stageCardActive,
+                      isStage1Completed && styles.stageCardCompleted
+                    ]}>
+                      <View style={styles.stageHeader}>
+                        <View style={styles.stageTitleContainer}>
+                          <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
+                          <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
+                        </View>
+                        <View style={styles.stageIconContainer}>
+                          <IconSymbol
+                            ios_icon_name="person.fill"
+                            android_material_icon_name="person"
+                            size={28}
+                            color={calculatedDates.currentStage === 1 ? '#4FC3F7' : isStage1Completed ? '#4CAF50' : '#8E8E93'}
+                          />
+                        </View>
+                      </View>
+
+                      <View style={styles.requirementBox}>
+                        <Text style={styles.requirementText}>חובת ליווי 24/7</Text>
+                      </View>
+
+                      <View style={styles.progressContainer}>
+                        <View style={styles.progressBar}>
+                          <View style={[styles.progressFill, { width: `${stage1Progress}%`, backgroundColor: isStage1Completed ? '#4CAF50' : '#4FC3F7' }]} />
+                        </View>
+                        <Text style={styles.progressText}>
+                          {Math.round(stage1Progress)}%
+                        </Text>
+                      </View>
+
+                      <View style={styles.stageDetails}>
+                        <View style={styles.detailRow}>
+                          <Text style={styles.detailLabel}>ימים שנותרו</Text>
+                          <Text style={styles.detailValue}>{calculatedDates.stage1Remaining}</Text>
+                        </View>
+                        <View style={styles.detailRow}>
+                          <Text style={styles.detailLabel}>תאריך סיום</Text>
+                          <Text style={styles.detailValue}>{threeMonthsDisplay}</Text>
+                        </View>
+                      </View>
+
+                      {calculatedDates.currentStage === 1 && (
+                        <View style={styles.currentBadge}>
+                          <Text style={styles.currentBadgeText}>שלב נוכחי</Text>
+                        </View>
+                      )}
+
+                      {isStage1Completed && (
+                        <TouchableOpacity
+                          style={styles.collapseButton}
+                          onPress={() => {
+                            console.log('User tapped to collapse Stage 1');
+                            setStage1Expanded(false);
+                          }}
+                        >
+                          <Text style={styles.collapseButtonText}>כווץ</Text>
+                          <IconSymbol
+                            ios_icon_name="chevron.up"
+                            android_material_icon_name="expand-less"
+                            size={18}
+                            color={colors.textSecondary}
+                          />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  )}
+
+                  {isStage2Completed && !stage2Expanded ? (
+                    <TouchableOpacity
+                      style={styles.stageCardCollapsed}
+                      onPress={() => {
+                        console.log('User tapped to expand Stage 2');
+                        setStage2Expanded(true);
+                      }}
+                    >
+                      <View style={styles.collapsedContent}>
+                        <View style={styles.collapsedLeft}>
+                          <IconSymbol
+                            ios_icon_name="checkmark.circle.fill"
+                            android_material_icon_name="check-circle"
+                            size={28}
+                            color="#4CAF50"
+                          />
+                        </View>
+                        <View style={styles.collapsedCenter}>
+                          <Text style={styles.collapsedTitle}>שלב 2 - מלווה לילה</Text>
+                          <Text style={styles.collapsedStatus}>הסתיים</Text>
+                        </View>
+                        <View style={styles.collapsedRight}>
+                          <IconSymbol
+                            ios_icon_name="chevron.down"
+                            android_material_icon_name="expand-more"
+                            size={24}
+                            color={colors.textSecondary}
+                          />
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  ) : (
+                    <View style={[
+                      styles.stageCard,
+                      calculatedDates.currentStage === 2 && styles.stageCardActive,
+                      isStage2Completed && styles.stageCardCompleted
+                    ]}>
+                      <View style={styles.stageHeader}>
+                        <View style={styles.stageTitleContainer}>
+                          <Text style={styles.stageTitle}>שלב 2 - מלווה לילה</Text>
+                          <Text style={styles.stageSubtitle}>3 חודשים נוספים</Text>
+                        </View>
+                        <View style={styles.stageIconContainer}>
+                          <IconSymbol
+                            ios_icon_name="moon.fill"
+                            android_material_icon_name="nightlight"
+                            size={28}
+                            color={calculatedDates.currentStage === 2 ? '#4FC3F7' : isStage2Completed ? '#4CAF50' : '#8E8E93'}
+                          />
+                        </View>
+                      </View>
+
+                      <View style={styles.requirementBox}>
+                        <Text style={styles.requirementText}>חובת ליווי בין 21:00 ל-6:00 בלבד.</Text>
+                      </View>
+
+                      <View style={styles.progressContainer}>
+                        <View style={styles.progressBar}>
+                          <View style={[styles.progressFill, { width: `${stage2Progress}%`, backgroundColor: isStage2Completed ? '#4CAF50' : '#4FC3F7' }]} />
+                        </View>
+                        <Text style={styles.progressText}>
+                          {Math.round(stage2Progress)}%
+                        </Text>
+                      </View>
+
+                      <View style={styles.stageDetails}>
+                        <View style={styles.detailRow}>
+                          <Text style={styles.detailLabel}>ימים שנותרו</Text>
+                          <Text style={styles.detailValue}>{calculatedDates.stage2Remaining}</Text>
+                        </View>
+                        <View style={styles.detailRow}>
+                          <Text style={styles.detailLabel}>תאריך סיום</Text>
+                          <Text style={styles.detailValue}>{sixMonthsDisplay}</Text>
+                        </View>
+                      </View>
+
+                      {calculatedDates.currentStage === 2 && (
+                        <View style={styles.currentBadge}>
+                          <Text style={styles.currentBadgeText}>שלב נוכחי</Text>
+                        </View>
+                      )}
+
+                      {isStage2Completed && (
+                        <TouchableOpacity
+                          style={styles.collapseButton}
+                          onPress={() => {
+                            console.log('User tapped to collapse Stage 2');
+                            setStage2Expanded(false);
+                          }}
+                        >
+                          <Text style={styles.collapseButtonText}>כווץ</Text>
+                          <IconSymbol
+                            ios_icon_name="chevron.up"
+                            android_material_icon_name="expand-less"
+                            size={18}
+                            color={colors.textSecondary}
+                          />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  )}
+                </View>
+              </>
+            ) : (
+              <View style={styles.totalViewContainer}>
+                <View style={styles.totalCard}>
+                  <View style={styles.totalHeader}>
+                    <View style={styles.totalTitleContainer}>
+                      <Text style={styles.totalTitle}>סה"כ תקופת מלווה</Text>
+                      <Text style={styles.totalSubtitle}>6 חודשים</Text>
+                    </View>
+                    <View style={styles.totalIconContainer}>
+                      <IconSymbol
+                        ios_icon_name="calendar"
+                        android_material_icon_name="calendar-today"
+                        size={32}
+                        color="#4FC3F7"
+                      />
+                    </View>
+                  </View>
+
+                  <View style={styles.totalStatsRow}>
+                    <View style={styles.totalStatBox}>
+                      <Text style={styles.totalStatValue}>{getTotalDaysRemaining()}</Text>
+                      <Text style={styles.totalStatLabel}>ימים נותרו</Text>
+                    </View>
+                    <View style={styles.totalStatDivider} />
+                    <View style={styles.totalStatBox}>
+                      <Text style={styles.totalStatValue}>{getTotalDaysCompleted()}</Text>
+                      <Text style={styles.totalStatLabel}>ימים הושלמו</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.totalProgressContainer}>
+                    <View style={styles.totalProgressBar}>
+                      <View style={[styles.totalProgressFill, { width: `${getTotalProgress()}%` }]} />
+                    </View>
+                    <Text style={styles.totalProgressText}>
+                      {Math.round(getTotalProgress())}%
+                    </Text>
+                  </View>
+
+                  <View style={styles.totalDetails}>
+                    <View style={styles.totalDetailRow}>
+                      <Text style={styles.totalDetailLabel}>תאריך התחלה</Text>
+                      <Text style={styles.totalDetailValue}>{startDateDisplay}</Text>
+                    </View>
+                    <View style={styles.totalDetailRow}>
+                      <Text style={styles.totalDetailLabel}>תאריך סיום</Text>
+                      <Text style={styles.totalDetailValue}>{sixMonthsDisplay}</Text>
+                    </View>
+                    <View style={styles.totalDetailRow}>
+                      <Text style={styles.totalDetailLabel}>סה"כ ימים</Text>
+                      <Text style={styles.totalDetailValue}>{calculatedDates.stage1Total + calculatedDates.stage2Total}</Text>
+                    </View>
+                  </View>
+
+                  {calculatedDates.currentStage !== 'completed' && (
+                    <View style={styles.totalInfoBox}>
+                      <IconSymbol
+                        ios_icon_name="info.circle.fill"
+                        android_material_icon_name="info"
+                        size={20}
+                        color="#4FC3F7"
+                      />
+                      <Text style={styles.totalInfoText}>
+                        {calculatedDates.currentStage === 1 
+                          ? 'כרגע בשלב 1 - מלווה 24/7'
+                          : 'כרגע בשלב 2 - מלווה לילה בלבד'}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            )}
 
             {calculatedDates.showNotification && (
               <View style={styles.notificationCard}>
@@ -656,6 +788,181 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: colors.text,
     textAlign: 'center',
+  },
+  toggleContainer: {
+    flexDirection: 'row-reverse',
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 4,
+    marginBottom: 24,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toggleButtonActive: {
+    backgroundColor: '#4FC3F7',
+  },
+  toggleButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  toggleButtonTextActive: {
+    color: '#FFFFFF',
+  },
+  totalViewContainer: {
+    marginBottom: 24,
+  },
+  totalCard: {
+    backgroundColor: colors.card,
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 2,
+    borderColor: '#4FC3F7',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#4FC3F7',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 6,
+      },
+      web: {
+        boxShadow: '0px 4px 20px rgba(79, 195, 247, 0.25)',
+      },
+    }),
+  },
+  totalHeader: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 24,
+  },
+  totalTitleContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  totalTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.text,
+    textAlign: 'right',
+  },
+  totalSubtitle: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    marginTop: 4,
+    fontWeight: '600',
+    textAlign: 'right',
+  },
+  totalIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: colors.backgroundAlt,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  totalStatsRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  totalStatBox: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  totalStatValue: {
+    fontSize: 40,
+    fontWeight: '900',
+    color: '#4FC3F7',
+    textAlign: 'center',
+  },
+  totalStatLabel: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginTop: 4,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  totalStatDivider: {
+    width: 1,
+    height: 50,
+    backgroundColor: colors.border,
+    marginHorizontal: 16,
+  },
+  totalProgressContainer: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 24,
+  },
+  totalProgressBar: {
+    flex: 1,
+    height: 14,
+    backgroundColor: colors.backgroundAlt,
+    borderRadius: 7,
+    overflow: 'hidden',
+  },
+  totalProgressFill: {
+    height: '100%',
+    backgroundColor: '#4FC3F7',
+    borderRadius: 7,
+  },
+  totalProgressText: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.text,
+    minWidth: 55,
+    textAlign: 'right',
+  },
+  totalDetails: {
+    gap: 12,
+    marginBottom: 16,
+  },
+  totalDetailRow: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  totalDetailLabel: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    fontWeight: '600',
+    textAlign: 'right',
+  },
+  totalDetailValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'right',
+  },
+  totalInfoBox: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#E3F2FD',
+    padding: 14,
+    borderRadius: 12,
+  },
+  totalInfoText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#1976D2',
+    fontWeight: '600',
+    textAlign: 'right',
+    lineHeight: 20,
   },
   dateCard: {
     backgroundColor: colors.card,
