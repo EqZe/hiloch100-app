@@ -5,7 +5,7 @@ import FloatingTabBar, { TabBarItem } from '@/components/FloatingTabBar';
 import { WebViewProvider, useWebView } from '@/contexts/WebViewContext';
 
 function TabLayoutContent() {
-  const { showAccessDenied, accessGranted, currentUrl } = useWebView();
+  const { showAccessDenied, accessGranted, currentUrl, isWebViewLoaded } = useWebView();
 
   const tabs: TabBarItem[] = [
     {
@@ -35,10 +35,11 @@ function TabLayoutContent() {
   // - Hide if access is denied (showAccessDenied = true)
   // - Hide if on hiloch100.co.il homepage (isOnHilochHomepage = true)
   // - Hide if access has NOT been granted yet (accessGranted = false)
-  // - Show only when accessGranted = true AND showAccessDenied = false AND NOT on homepage
-  const shouldShowNavbar = accessGranted && !showAccessDenied && !isOnHilochHomepage;
+  // - Hide if WebView page has NOT finished loading yet (isWebViewLoaded = false)
+  // - Show only when ALL conditions are met: accessGranted = true AND showAccessDenied = false AND NOT on homepage AND isWebViewLoaded = true
+  const shouldShowNavbar = accessGranted && !showAccessDenied && !isOnHilochHomepage && isWebViewLoaded;
 
-  console.log('TabLayout: accessGranted:', accessGranted, 'showAccessDenied:', showAccessDenied, 'currentUrl:', currentUrl, 'isOnHilochHomepage:', isOnHilochHomepage, '- Navbar will be', shouldShowNavbar ? 'VISIBLE' : 'HIDDEN');
+  console.log('TabLayout: accessGranted:', accessGranted, 'showAccessDenied:', showAccessDenied, 'currentUrl:', currentUrl, 'isOnHilochHomepage:', isOnHilochHomepage, 'isWebViewLoaded:', isWebViewLoaded, '- Navbar will be', shouldShowNavbar ? 'VISIBLE' : 'HIDDEN');
 
   return (
     <>
@@ -52,7 +53,7 @@ function TabLayoutContent() {
         <Stack.Screen key="counter" name="counter" />
         <Stack.Screen key="expenses" name="expenses" />
       </Stack>
-      {/* Only render FloatingTabBar when access is granted, not denied, and not on homepage */}
+      {/* Only render FloatingTabBar when access is granted, not denied, not on homepage, AND page has loaded */}
       {shouldShowNavbar && <FloatingTabBar tabs={tabs} />}
     </>
   );

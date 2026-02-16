@@ -12,7 +12,7 @@ I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
 export default function PersistentWebView() {
-  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted, setCurrentUrl } = useWebView();
+  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted, setCurrentUrl, setIsWebViewLoaded } = useWebView();
   const pathname = usePathname();
   
   const isVisible = pathname === '/(tabs)/course' || pathname === '/course';
@@ -27,6 +27,9 @@ export default function PersistentWebView() {
     
     // Update current URL in context
     setCurrentUrl(currentUrl);
+    
+    // Reset isWebViewLoaded when navigation starts to a new page
+    setIsWebViewLoaded(false);
     
     const isCourseUrl = currentUrl.includes('/course');
     const isHilochHomepage = currentUrl === 'https://hiloch100.co.il/' || currentUrl === 'https://hiloch100.co.il';
@@ -57,9 +60,9 @@ export default function PersistentWebView() {
           setAccessGranted(false);
           return; // Block further navigation/checks
         } else if (mobileAppParam === 'granted') {
-          console.log('PersistentWebView: Access GRANTED - mobileapp=granted detected - SHOWING NAVBAR');
+          console.log('PersistentWebView: Access GRANTED - mobileapp=granted detected - SHOWING NAVBAR AFTER PAGE LOADS');
           setShowAccessDenied(false);
-          setAccessGranted(true); // Mark access as granted - navbar will now show and stay shown
+          setAccessGranted(true); // Mark access as granted - navbar will show after page loads
         } else {
           console.log('PersistentWebView: No mobileapp parameter or invalid value - navbar remains hidden until granted');
         }
@@ -67,22 +70,25 @@ export default function PersistentWebView() {
         console.log('PersistentWebView: No URL parameters found - navbar remains hidden until granted');
       }
     }
-  }, [setShowAccessDenied, setAccessGranted, setCurrentUrl]);
+  }, [setShowAccessDenied, setAccessGranted, setCurrentUrl, setIsWebViewLoaded]);
 
   const handleLoadStart = () => {
-    console.log('PersistentWebView: Load started');
+    console.log('PersistentWebView: Load started - hiding navbar');
     setIsLoading(true);
+    setIsWebViewLoaded(false); // Hide navbar when new page starts loading
   };
 
   const handleLoadEnd = () => {
-    console.log('PersistentWebView: Load ended');
+    console.log('PersistentWebView: Load ended - page fully loaded, navbar can now show if access granted');
     setIsLoading(false);
+    setIsWebViewLoaded(true); // Mark WebView as loaded - navbar can now show if access is granted
   };
 
   const handleError = (syntheticEvent: any) => {
     const { nativeEvent } = syntheticEvent;
     console.log('PersistentWebView: Error occurred:', nativeEvent);
     setIsLoading(false);
+    setIsWebViewLoaded(false); // Don't show navbar on error
   };
 
   const handleContactTeam = useCallback(() => {
