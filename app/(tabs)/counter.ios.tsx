@@ -568,6 +568,17 @@ export default function CounterScreen() {
                   styles.totalCard,
                   isFullyCompleted && styles.totalCardCompleted
                 ]}>
+                  {isFullyCompleted && (
+                    <View style={styles.completedCheckmarkContainer}>
+                      <IconSymbol
+                        ios_icon_name="checkmark.circle.fill"
+                        android_material_icon_name="check-circle"
+                        size={48}
+                        color="#4CAF50"
+                      />
+                    </View>
+                  )}
+
                   <View style={styles.totalHeader}>
                     <View style={styles.totalTitleContainer}>
                       <Text style={styles.totalTitle}>סה"כ תקופת מלווה</Text>
@@ -938,6 +949,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
+  },
+  completedCheckmarkContainer: {
+    alignItems: 'center',
+    marginBottom: 16,
   },
   totalHeader: {
     flexDirection: 'row-reverse',
