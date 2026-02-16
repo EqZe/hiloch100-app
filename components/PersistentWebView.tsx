@@ -12,32 +12,36 @@ I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
 export default function PersistentWebView() {
-  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted, setCurrentUrl, setIsWebViewLoaded } = useWebView();
+  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted, setCurrentUrl, setIsWebViewLoaded, currentUrl } = useWebView();
   const pathname = usePathname();
   const previousUrlRef = useRef<string>('');
   
   const isVisible = pathname === '/(tabs)/course' || pathname === '/course';
+
+  // Check if we're on the hiloch100.co.il homepage
+  const isOnHilochHomepage = currentUrl === 'https://hiloch100.co.il/' || currentUrl === 'https://hiloch100.co.il';
 
   useEffect(() => {
     console.log('PersistentWebView: Current pathname:', pathname, 'Visible:', isVisible);
   }, [pathname, isVisible]);
 
   const handleNavigationStateChange = useCallback((navState: WebViewNavigation) => {
-    const currentUrl = navState.url;
-    console.log('PersistentWebView: Navigation state changed to:', currentUrl);
+    const newUrl = navState.url;
+    console.log('PersistentWebView: Navigation state changed to:', newUrl);
     
     // Update current URL in context
-    setCurrentUrl(currentUrl);
+    setCurrentUrl(newUrl);
     
     // Only reset isWebViewLoaded when navigating to a NEW URL (not on same-page updates)
-    if (previousUrlRef.current !== currentUrl) {
-      console.log('PersistentWebView: URL changed from', previousUrlRef.current, 'to', currentUrl, '- resetting isWebViewLoaded');
+    if (previousUrlRef.current !== newUrl) {
+      console.log('PersistentWebView: URL changed from', previousUrlRef.current, 'to', newUrl, '- resetting isWebViewLoaded');
       setIsWebViewLoaded(false);
-      previousUrlRef.current = currentUrl;
+      previousUrlRef.current = newUrl;
     }
     
-    const isCourseUrl = currentUrl.includes('/course');
-    const isHilochHomepage = currentUrl === 'https://hiloch100.co.il/' || currentUrl === 'https://hiloch100.co.il';
+    const isCourseUrl = newUrl.includes('/course');
+    const isHilochHomepage = newUrl === 'https://hiloch100.co.il/' || newUrl === 'https://hiloch100.co.il';
+    const isLoginPage = newUrl.includes('/login');
 
     // Special handling for hiloch100.co.il homepage
     if (isHilochHomepage) {
@@ -47,12 +51,20 @@ export default function PersistentWebView() {
       return;
     }
 
+    // Special handling for login page - ALWAYS hide navbar
+    if (isLoginPage) {
+      console.log('PersistentWebView: On login page - hiding navbar');
+      setAccessGranted(false); // Ensure navbar stays hidden
+      setShowAccessDenied(false); // Don't show access denied overlay
+      return;
+    }
+
     // Parameter Check Logic - PRIORITY CHECK
     if (isCourseUrl) {
       console.log('PersistentWebView: Detected /course URL, checking mobileapp parameter...');
       
       // Parse URL parameters
-      const urlParts = currentUrl.split('?');
+      const urlParts = newUrl.split('?');
       if (urlParts.length > 1) {
         const urlParams = new URLSearchParams(urlParts[1]);
         const mobileAppParam = urlParams.get('mobileapp');
@@ -128,6 +140,7 @@ export default function PersistentWebView() {
           domStorageEnabled={true}
           sharedCookiesEnabled={true}
           thirdPartyCookiesEnabled={true}
+          scrollEnabled={!isOnHilochHomepage}
         />
       </View>
 

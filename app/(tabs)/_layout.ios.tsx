@@ -30,16 +30,20 @@ function TabLayoutContent() {
 
   // Check if we're on the hiloch100.co.il homepage
   const isOnHilochHomepage = currentUrl === 'https://hiloch100.co.il/' || currentUrl === 'https://hiloch100.co.il';
+  
+  // Check if we're on the login page
+  const isOnLoginPage = currentUrl.includes('/login');
 
   // Navbar visibility logic:
   // - Hide if access is denied (showAccessDenied = true)
   // - Hide if on hiloch100.co.il homepage (isOnHilochHomepage = true)
+  // - Hide if on login page (isOnLoginPage = true)
   // - Hide if access has NOT been granted yet (accessGranted = false)
   // - Hide if WebView page has NOT finished loading yet (isWebViewLoaded = false)
-  // - Show only when ALL conditions are met: accessGranted = true AND showAccessDenied = false AND NOT on homepage AND isWebViewLoaded = true
-  const shouldShowNavbar = accessGranted && !showAccessDenied && !isOnHilochHomepage && isWebViewLoaded;
+  // - Show only when ALL conditions are met: accessGranted = true AND showAccessDenied = false AND NOT on homepage AND NOT on login page AND isWebViewLoaded = true
+  const shouldShowNavbar = accessGranted && !showAccessDenied && !isOnHilochHomepage && !isOnLoginPage && isWebViewLoaded;
 
-  console.log('TabLayout (iOS): accessGranted:', accessGranted, 'showAccessDenied:', showAccessDenied, 'currentUrl:', currentUrl, 'isOnHilochHomepage:', isOnHilochHomepage, 'isWebViewLoaded:', isWebViewLoaded, '- Navbar will be', shouldShowNavbar ? 'VISIBLE' : 'HIDDEN');
+  console.log('TabLayout (iOS): accessGranted:', accessGranted, 'showAccessDenied:', showAccessDenied, 'currentUrl:', currentUrl, 'isOnHilochHomepage:', isOnHilochHomepage, 'isOnLoginPage:', isOnLoginPage, 'isWebViewLoaded:', isWebViewLoaded, '- Navbar will be', shouldShowNavbar ? 'VISIBLE' : 'HIDDEN');
 
   return (
     <>
@@ -53,7 +57,7 @@ function TabLayoutContent() {
         <Stack.Screen key="counter" name="counter" />
         <Stack.Screen key="expenses" name="expenses" />
       </Stack>
-      {/* Only render FloatingTabBar when access is granted, not denied, not on homepage, AND page has loaded */}
+      {/* Only render FloatingTabBar when access is granted, not denied, not on homepage, not on login page, AND page has loaded */}
       {shouldShowNavbar && <FloatingTabBar tabs={tabs} />}
     </>
   );
