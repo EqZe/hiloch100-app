@@ -1,5 +1,5 @@
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { View, StyleSheet, Platform, Text, TouchableOpacity, Linking, I18nManager, Image } from 'react-native';
 import { WebView, WebViewNavigation } from 'react-native-webview';
 import { useWebView } from '@/contexts/WebViewContext';
@@ -14,6 +14,7 @@ I18nManager.forceRTL(true);
 export default function PersistentWebView() {
   const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted, setCurrentUrl, setIsWebViewLoaded } = useWebView();
   const pathname = usePathname();
+  const previousUrlRef = useRef<string>('');
   
   const isVisible = pathname === '/(tabs)/course' || pathname === '/course';
 
@@ -28,8 +29,12 @@ export default function PersistentWebView() {
     // Update current URL in context
     setCurrentUrl(currentUrl);
     
-    // Reset isWebViewLoaded when navigation starts to a new page
-    setIsWebViewLoaded(false);
+    // Only reset isWebViewLoaded when navigating to a NEW URL (not on same-page updates)
+    if (previousUrlRef.current !== currentUrl) {
+      console.log('PersistentWebView: URL changed from', previousUrlRef.current, 'to', currentUrl, '- resetting isWebViewLoaded');
+      setIsWebViewLoaded(false);
+      previousUrlRef.current = currentUrl;
+    }
     
     const isCourseUrl = currentUrl.includes('/course');
     const isHilochHomepage = currentUrl === 'https://hiloch100.co.il/' || currentUrl === 'https://hiloch100.co.il';
@@ -75,7 +80,7 @@ export default function PersistentWebView() {
   const handleLoadStart = () => {
     console.log('PersistentWebView: Load started - hiding navbar');
     setIsLoading(true);
-    setIsWebViewLoaded(false); // Hide navbar when new page starts loading
+    // Don't reset isWebViewLoaded here - let handleNavigationStateChange handle it
   };
 
   const handleLoadEnd = () => {
