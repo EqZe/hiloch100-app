@@ -5,7 +5,7 @@ import FloatingTabBar, { TabBarItem } from '@/components/FloatingTabBar';
 import { WebViewProvider, useWebView } from '@/contexts/WebViewContext';
 
 function TabLayoutContent() {
-  const { showAccessDenied, accessGranted } = useWebView();
+  const { showAccessDenied, accessGranted, currentUrl } = useWebView();
 
   const tabs: TabBarItem[] = [
     {
@@ -28,13 +28,17 @@ function TabLayoutContent() {
     },
   ];
 
+  // Check if we're on the hiloch100.co.il homepage
+  const isOnHilochHomepage = currentUrl === 'https://hiloch100.co.il/' || currentUrl === 'https://hiloch100.co.il';
+
   // Navbar visibility logic:
   // - Hide if access is denied (showAccessDenied = true)
+  // - Hide if on hiloch100.co.il homepage (isOnHilochHomepage = true)
   // - Hide if access has NOT been granted yet (accessGranted = false)
-  // - Show only when accessGranted = true AND showAccessDenied = false
-  const shouldShowNavbar = accessGranted && !showAccessDenied;
+  // - Show only when accessGranted = true AND showAccessDenied = false AND NOT on homepage
+  const shouldShowNavbar = accessGranted && !showAccessDenied && !isOnHilochHomepage;
 
-  console.log('TabLayout: accessGranted:', accessGranted, 'showAccessDenied:', showAccessDenied, '- Navbar will be', shouldShowNavbar ? 'VISIBLE' : 'HIDDEN');
+  console.log('TabLayout: accessGranted:', accessGranted, 'showAccessDenied:', showAccessDenied, 'currentUrl:', currentUrl, 'isOnHilochHomepage:', isOnHilochHomepage, '- Navbar will be', shouldShowNavbar ? 'VISIBLE' : 'HIDDEN');
 
   return (
     <>
@@ -48,7 +52,7 @@ function TabLayoutContent() {
         <Stack.Screen key="counter" name="counter" />
         <Stack.Screen key="expenses" name="expenses" />
       </Stack>
-      {/* Only render FloatingTabBar when access is granted and not denied */}
+      {/* Only render FloatingTabBar when access is granted, not denied, and not on homepage */}
       {shouldShowNavbar && <FloatingTabBar tabs={tabs} />}
     </>
   );

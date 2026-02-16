@@ -10,6 +10,8 @@ interface WebViewContextType {
   setShowAccessDenied: (show: boolean) => void;
   accessGranted: boolean;
   setAccessGranted: (granted: boolean) => void;
+  currentUrl: string;
+  setCurrentUrl: (url: string) => void;
 }
 
 const WebViewContext = createContext<WebViewContextType>({
@@ -20,6 +22,8 @@ const WebViewContext = createContext<WebViewContextType>({
   setShowAccessDenied: () => {},
   accessGranted: false,
   setAccessGranted: () => {},
+  currentUrl: '',
+  setCurrentUrl: () => {},
 });
 
 export function WebViewProvider({ children }: { children: ReactNode }) {
@@ -27,8 +31,9 @@ export function WebViewProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [showAccessDenied, setShowAccessDenied] = useState(false);
   const [accessGranted, setAccessGranted] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState('');
 
-  console.log('WebViewProvider: Initialized - loading:', isLoading, 'accessDenied:', showAccessDenied, 'accessGranted:', accessGranted);
+  console.log('WebViewProvider: Initialized - loading:', isLoading, 'accessDenied:', showAccessDenied, 'accessGranted:', accessGranted, 'currentUrl:', currentUrl);
 
   return (
     <WebViewContext.Provider value={{ 
@@ -38,7 +43,9 @@ export function WebViewProvider({ children }: { children: ReactNode }) {
       showAccessDenied, 
       setShowAccessDenied,
       accessGranted,
-      setAccessGranted
+      setAccessGranted,
+      currentUrl,
+      setCurrentUrl
     }}>
       {children}
     </WebViewContext.Provider>

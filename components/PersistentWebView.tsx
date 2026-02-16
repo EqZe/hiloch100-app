@@ -12,7 +12,7 @@ I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
 export default function PersistentWebView() {
-  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted } = useWebView();
+  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted, setCurrentUrl } = useWebView();
   const pathname = usePathname();
   
   const isVisible = pathname === '/(tabs)/course' || pathname === '/course';
@@ -25,7 +25,19 @@ export default function PersistentWebView() {
     const currentUrl = navState.url;
     console.log('PersistentWebView: Navigation state changed to:', currentUrl);
     
+    // Update current URL in context
+    setCurrentUrl(currentUrl);
+    
     const isCourseUrl = currentUrl.includes('/course');
+    const isHilochHomepage = currentUrl === 'https://hiloch100.co.il/' || currentUrl === 'https://hiloch100.co.il';
+
+    // Special handling for hiloch100.co.il homepage
+    if (isHilochHomepage) {
+      console.log('PersistentWebView: On hiloch100.co.il homepage - hiding navbar and showing content');
+      setShowAccessDenied(false);
+      // Don't set accessGranted to true here - navbar should stay hidden
+      return;
+    }
 
     // Parameter Check Logic - PRIORITY CHECK
     if (isCourseUrl) {
@@ -55,7 +67,7 @@ export default function PersistentWebView() {
         console.log('PersistentWebView: No URL parameters found - navbar remains hidden until granted');
       }
     }
-  }, [setShowAccessDenied, setAccessGranted]);
+  }, [setShowAccessDenied, setAccessGranted, setCurrentUrl]);
 
   const handleLoadStart = () => {
     console.log('PersistentWebView: Load started');
