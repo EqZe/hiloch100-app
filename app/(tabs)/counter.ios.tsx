@@ -266,6 +266,8 @@ export default function CounterScreen() {
   const completionTitle = 'סיימת מלווה!';
   const completionSubtitle = 'תהנה עם הרישיון';
 
+  const totalCircleColor = isFullyCompleted ? '#4CAF50' : '#4FC3F7';
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView
@@ -536,7 +538,7 @@ export default function CounterScreen() {
                     size={280}
                     strokeWidth={20}
                     progress={totalProgress}
-                    color="#4FC3F7"
+                    color={totalCircleColor}
                     backgroundColor="#E0E0E0"
                   >
                     <View style={styles.totalCircleContent}>
@@ -562,74 +564,76 @@ export default function CounterScreen() {
                     : `${Math.round(totalProgress)}% מהליך הליווי הכולל הושלם`}
                 </Text>
 
-                <View style={styles.totalCard}>
-                  <View style={styles.totalHeader}>
-                    <View style={styles.totalTitleContainer}>
-                      <Text style={styles.totalTitle}>סה"כ תקופת מלווה</Text>
-                      <Text style={styles.totalSubtitle}>6 חודשים</Text>
+                {!isFullyCompleted && (
+                  <View style={styles.totalCard}>
+                    <View style={styles.totalHeader}>
+                      <View style={styles.totalTitleContainer}>
+                        <Text style={styles.totalTitle}>סה"כ תקופת מלווה</Text>
+                        <Text style={styles.totalSubtitle}>6 חודשים</Text>
+                      </View>
+                      <View style={styles.totalIconContainer}>
+                        <IconSymbol
+                          ios_icon_name="calendar"
+                          android_material_icon_name="calendar-today"
+                          size={32}
+                          color="#4FC3F7"
+                        />
+                      </View>
                     </View>
-                    <View style={styles.totalIconContainer}>
-                      <IconSymbol
-                        ios_icon_name="calendar"
-                        android_material_icon_name="calendar-today"
-                        size={32}
-                        color="#4FC3F7"
-                      />
-                    </View>
-                  </View>
 
-                  <View style={styles.totalStatsRow}>
-                    <View style={styles.totalStatBox}>
-                      <Text style={styles.totalStatValue}>{getTotalDaysRemaining()}</Text>
-                      <Text style={styles.totalStatLabel}>ימים נותרו</Text>
+                    <View style={styles.totalStatsRow}>
+                      <View style={styles.totalStatBox}>
+                        <Text style={styles.totalStatValue}>{getTotalDaysRemaining()}</Text>
+                        <Text style={styles.totalStatLabel}>ימים נותרו</Text>
+                      </View>
+                      <View style={styles.totalStatDivider} />
+                      <View style={styles.totalStatBox}>
+                        <Text style={styles.totalStatValue}>{getTotalDaysCompleted()}</Text>
+                        <Text style={styles.totalStatLabel}>ימים הושלמו</Text>
+                      </View>
                     </View>
-                    <View style={styles.totalStatDivider} />
-                    <View style={styles.totalStatBox}>
-                      <Text style={styles.totalStatValue}>{getTotalDaysCompleted()}</Text>
-                      <Text style={styles.totalStatLabel}>ימים הושלמו</Text>
-                    </View>
-                  </View>
 
-                  <View style={styles.totalProgressContainer}>
-                    <View style={styles.totalProgressBar}>
-                      <View style={[styles.totalProgressFill, { width: `${getTotalProgress()}%` }]} />
-                    </View>
-                    <Text style={styles.totalProgressText}>
-                      {totalProgressPercentText}
-                    </Text>
-                  </View>
-
-                  <View style={styles.totalDetails}>
-                    <View style={styles.totalDetailRow}>
-                      <Text style={styles.totalDetailLabel}>תאריך התחלה</Text>
-                      <Text style={styles.totalDetailValue}>{startDateDisplay}</Text>
-                    </View>
-                    <View style={styles.totalDetailRow}>
-                      <Text style={styles.totalDetailLabel}>תאריך סיום</Text>
-                      <Text style={styles.totalDetailValue}>{sixMonthsDisplay}</Text>
-                    </View>
-                    <View style={styles.totalDetailRow}>
-                      <Text style={styles.totalDetailLabel}>סה"כ ימים</Text>
-                      <Text style={styles.totalDetailValue}>{calculatedDates.stage1Total + calculatedDates.stage2Total}</Text>
-                    </View>
-                  </View>
-
-                  {calculatedDates.currentStage !== 'completed' && (
-                    <View style={styles.totalInfoBox}>
-                      <IconSymbol
-                        ios_icon_name="info.circle.fill"
-                        android_material_icon_name="info"
-                        size={20}
-                        color="#4FC3F7"
-                      />
-                      <Text style={styles.totalInfoText}>
-                        {calculatedDates.currentStage === 1 
-                          ? 'כרגע בשלב 1 - מלווה 24/7'
-                          : 'כרגע בשלב 2 - מלווה לילה בלבד'}
+                    <View style={styles.totalProgressContainer}>
+                      <View style={styles.totalProgressBar}>
+                        <View style={[styles.totalProgressFill, { width: `${getTotalProgress()}%` }]} />
+                      </View>
+                      <Text style={styles.totalProgressText}>
+                        {totalProgressPercentText}
                       </Text>
                     </View>
-                  )}
-                </View>
+
+                    <View style={styles.totalDetails}>
+                      <View style={styles.totalDetailRow}>
+                        <Text style={styles.totalDetailLabel}>תאריך התחלה</Text>
+                        <Text style={styles.totalDetailValue}>{startDateDisplay}</Text>
+                      </View>
+                      <View style={styles.totalDetailRow}>
+                        <Text style={styles.totalDetailLabel}>תאריך סיום</Text>
+                        <Text style={styles.totalDetailValue}>{sixMonthsDisplay}</Text>
+                      </View>
+                      <View style={styles.totalDetailRow}>
+                        <Text style={styles.totalDetailLabel}>סה"כ ימים</Text>
+                        <Text style={styles.totalDetailValue}>{calculatedDates.stage1Total + calculatedDates.stage2Total}</Text>
+                      </View>
+                    </View>
+
+                    {calculatedDates.currentStage !== 'completed' && (
+                      <View style={styles.totalInfoBox}>
+                        <IconSymbol
+                          ios_icon_name="info.circle.fill"
+                          android_material_icon_name="info"
+                          size={20}
+                          color="#4FC3F7"
+                        />
+                        <Text style={styles.totalInfoText}>
+                          {calculatedDates.currentStage === 1 
+                            ? 'כרגע בשלב 1 - מלווה 24/7'
+                            : 'כרגע בשלב 2 - מלווה לילה בלבד'}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
               </View>
             )}
 
