@@ -678,9 +678,6 @@ export default function CounterScreen() {
                           <Text style={styles.totalEndDateText}>{sixMonthsDisplay}</Text>
                           <Text style={styles.totalMainNumber}>{totalDaysRemainingText}</Text>
                           <Text style={styles.totalMainLabel}>ימים נותרו</Text>
-                          <View style={styles.totalStageIndicator}>
-                            <Text style={styles.totalStageText}>סה"כ תקופת מלווה</Text>
-                          </View>
                         </>
                       )}
                     </View>
