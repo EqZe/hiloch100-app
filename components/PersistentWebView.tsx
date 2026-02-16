@@ -21,6 +21,37 @@ export default function PersistentWebView() {
   // Check if we're on the hiloch100.co.il homepage
   const isOnHilochHomepage = currentUrl === 'https://hiloch100.co.il/' || currentUrl === 'https://hiloch100.co.il';
 
+  // JavaScript to inject that prevents scrolling but keeps interactivity
+  const injectedJavaScript = isOnHilochHomepage ? `
+    (function() {
+      // Prevent scrolling while keeping touch events for links/buttons
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      
+      // Prevent scroll events
+      window.addEventListener('scroll', function(e) {
+        window.scrollTo(0, 0);
+      }, { passive: false });
+      
+      // Prevent touch-based scrolling
+      var startY = 0;
+      document.addEventListener('touchstart', function(e) {
+        startY = e.touches[0].pageY;
+      }, { passive: true });
+      
+      document.addEventListener('touchmove', function(e) {
+        var currentY = e.touches[0].pageY;
+        // Only prevent if it's a scroll gesture (not a tap)
+        if (Math.abs(currentY - startY) > 10) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+      
+      console.log('Scroll prevention injected for homepage');
+    })();
+    true;
+  ` : '';
+
   useEffect(() => {
     console.log('PersistentWebView: Current pathname:', pathname, 'Visible:', isVisible);
   }, [pathname, isVisible]);
@@ -140,7 +171,11 @@ export default function PersistentWebView() {
           domStorageEnabled={true}
           sharedCookiesEnabled={true}
           thirdPartyCookiesEnabled={true}
-          scrollEnabled={!isOnHilochHomepage}
+          scrollEnabled={true}
+          injectedJavaScript={injectedJavaScript}
+          onMessage={(event) => {
+            console.log('PersistentWebView: Message from WebView:', event.nativeEvent.data);
+          }}
         />
       </View>
 
