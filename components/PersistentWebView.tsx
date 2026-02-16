@@ -12,7 +12,7 @@ I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
 export default function PersistentWebView() {
-  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted, setCurrentUrl, setIsWebViewLoaded, currentUrl, hasInitiallyLoaded, setHasInitiallyLoaded } = useWebView();
+  const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted, setCurrentUrl, setIsWebViewLoaded, currentUrl } = useWebView();
   const pathname = usePathname();
   const previousUrlRef = useRef<string>('');
   
@@ -130,7 +130,6 @@ export default function PersistentWebView() {
     console.log('PersistentWebView: Load ended - page fully loaded, navbar can now show if access granted');
     setIsLoading(false);
     setIsWebViewLoaded(true); // Mark WebView as loaded - navbar can now show if access is granted
-    setHasInitiallyLoaded(true); // Mark that we've loaded at least once
   };
 
   const handleError = (syntheticEvent: any) => {
@@ -159,7 +158,7 @@ export default function PersistentWebView() {
       <View style={[styles.webviewContainer, showAccessDenied && styles.webviewHidden]}>
         <WebView
           ref={webViewRef}
-          source={!hasInitiallyLoaded ? { uri: 'https://hiloch100.co.il/course' } : undefined}
+          source={{ uri: 'https://hiloch100.co.il/course' }}
           style={styles.webview}
           onLoadStart={handleLoadStart}
           onLoadEnd={handleLoadEnd}
