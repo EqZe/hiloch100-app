@@ -16,6 +16,7 @@ import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
 import CustomDatePicker from '@/components/CustomDatePicker';
 import GamifiedCounter from '@/components/GamifiedCounter';
+import CircularProgress from '@/components/CircularProgress';
 
 const STORAGE_KEY = 'start_date';
 
@@ -274,8 +275,17 @@ export default function CounterScreen() {
 
   const datePickerTitle = 'תשלום אגרת היתר נהיגה';
 
-  const stagesButtonText = 'שלבים';
+  const stagesButtonText = 'לפי שלבי ליווי';
   const totalButtonText = 'סה"כ';
+
+  const totalDaysRemaining = getTotalDaysRemaining();
+  const totalProgress = getTotalProgress();
+  const totalDaysRemainingText = String(totalDaysRemaining);
+  const totalProgressPercentText = `${Math.round(totalProgress)}%`;
+
+  const isFullyCompleted = calculatedDates && calculatedDates.currentStage === 'completed' && totalDaysRemaining === 0;
+  const completionTitle = 'סיימת מלווה!';
+  const completionSubtitle = 'תהנה עם הרישיון';
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -649,6 +659,40 @@ export default function CounterScreen() {
               </>
             ) : (
               <View style={styles.totalViewContainer}>
+                <View style={styles.totalCircleContainer}>
+                  <CircularProgress
+                    size={280}
+                    strokeWidth={20}
+                    progress={totalProgress}
+                    color="#4FC3F7"
+                    backgroundColor="#E0E0E0"
+                  >
+                    <View style={styles.totalCircleContent}>
+                      {isFullyCompleted ? (
+                        <View style={styles.completionContainer}>
+                          <Text style={styles.completionTitle}>{completionTitle}</Text>
+                          <Text style={styles.completionSubtitle}>{completionSubtitle}</Text>
+                        </View>
+                      ) : (
+                        <>
+                          <Text style={styles.totalEndDateText}>{sixMonthsDisplay}</Text>
+                          <Text style={styles.totalMainNumber}>{totalDaysRemainingText}</Text>
+                          <Text style={styles.totalMainLabel}>ימים נותרו</Text>
+                          <View style={styles.totalStageIndicator}>
+                            <Text style={styles.totalStageText}>סה"כ תקופת מלווה</Text>
+                          </View>
+                        </>
+                      )}
+                    </View>
+                  </CircularProgress>
+                </View>
+
+                <Text style={styles.totalMotivationalText}>
+                  {isFullyCompleted 
+                    ? 'שמחים שעזרנו לך לעבור טסט - הילוך מאה'
+                    : `${Math.round(totalProgress)}% מהליך הליווי הכולל הושלם`}
+                </Text>
+
                 <View style={styles.totalCard}>
                   <View style={styles.totalHeader}>
                     <View style={styles.totalTitleContainer}>
@@ -682,7 +726,7 @@ export default function CounterScreen() {
                       <View style={[styles.totalProgressFill, { width: `${getTotalProgress()}%` }]} />
                     </View>
                     <Text style={styles.totalProgressText}>
-                      {Math.round(getTotalProgress())}%
+                      {totalProgressPercentText}
                     </Text>
                   </View>
 
@@ -820,6 +864,85 @@ const styles = StyleSheet.create({
   },
   totalViewContainer: {
     marginBottom: 24,
+  },
+  totalCircleContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    marginBottom: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#4FC3F7',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+      },
+      android: {
+        elevation: 10,
+      },
+      web: {
+        boxShadow: '0px 8px 30px rgba(79, 195, 247, 0.4)',
+      },
+    }),
+  },
+  totalCircleContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  totalEndDateText: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  totalMainNumber: {
+    fontSize: 72,
+    fontWeight: '900',
+    color: colors.text,
+    lineHeight: 80,
+  },
+  totalMainLabel: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  totalStageIndicator: {
+    backgroundColor: '#4FC3F7',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginTop: 12,
+  },
+  totalStageText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  completionContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  completionTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#4CAF50',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  completionSubtitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'center',
+  },
+  totalMotivationalText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'center',
+    marginBottom: 30,
+    paddingHorizontal: 20,
   },
   totalCard: {
     backgroundColor: colors.card,
