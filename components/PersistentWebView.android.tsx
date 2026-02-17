@@ -39,23 +39,23 @@ export default function PersistentWebView() {
         }
       }, { passive: false });
       
-      console.log('Scroll prevention injected for homepage');
+      console.log('Scroll prevention injected for homepage (Android)');
     })();
     true;
   ` : '';
 
   useEffect(() => {
-    console.log('PersistentWebView: Current pathname:', pathname, 'Visible:', isVisible);
+    console.log('PersistentWebView (Android): Current pathname:', pathname, 'Visible:', isVisible);
   }, [pathname, isVisible]);
 
   const handleNavigationStateChange = useCallback((navState: WebViewNavigation) => {
     const newUrl = navState.url;
-    console.log('PersistentWebView: Navigation state changed to:', newUrl);
+    console.log('PersistentWebView (Android): Navigation state changed to:', newUrl);
     
     setCurrentUrl(newUrl);
     
     if (previousUrlRef.current !== newUrl) {
-      console.log('PersistentWebView: URL changed from', previousUrlRef.current, 'to', newUrl, '- resetting isWebViewLoaded');
+      console.log('PersistentWebView (Android): URL changed from', previousUrlRef.current, 'to', newUrl, '- resetting isWebViewLoaded');
       setIsWebViewLoaded(false);
       previousUrlRef.current = newUrl;
     }
@@ -65,69 +65,69 @@ export default function PersistentWebView() {
     const isLoginPage = newUrl.includes('/login');
 
     if (isHilochHomepage) {
-      console.log('PersistentWebView: On hiloch100.co.il homepage - hiding navbar and showing content');
+      console.log('PersistentWebView (Android): On hiloch100.co.il homepage - hiding navbar and showing content');
       setShowAccessDenied(false);
       return;
     }
 
     if (isLoginPage) {
-      console.log('PersistentWebView: On login page - hiding navbar');
+      console.log('PersistentWebView (Android): On login page - hiding navbar');
       setAccessGranted(false);
       setShowAccessDenied(false);
       return;
     }
 
     if (isCourseUrl) {
-      console.log('PersistentWebView: Detected /course URL, checking mobileapp parameter...');
+      console.log('PersistentWebView (Android): Detected /course URL, checking mobileapp parameter...');
       
       const urlParts = newUrl.split('?');
       if (urlParts.length > 1) {
         const urlParams = new URLSearchParams(urlParts[1]);
         const mobileAppParam = urlParams.get('mobileapp');
         
-        console.log('PersistentWebView: mobileapp parameter value:', mobileAppParam);
+        console.log('PersistentWebView (Android): mobileapp parameter value:', mobileAppParam);
 
         if (mobileAppParam === 'denied') {
-          console.log('PersistentWebView: Access DENIED - mobileapp=denied detected - BLOCKING ENTIRE APP INCLUDING NAVBAR');
+          console.log('PersistentWebView (Android): Access DENIED - mobileapp=denied detected - BLOCKING ENTIRE APP INCLUDING NAVBAR');
           setShowAccessDenied(true);
           setAccessGranted(false);
           return;
         } else if (mobileAppParam === 'granted') {
-          console.log('PersistentWebView: Access GRANTED - mobileapp=granted detected - SHOWING NAVBAR AFTER PAGE LOADS');
+          console.log('PersistentWebView (Android): Access GRANTED - mobileapp=granted detected - SHOWING NAVBAR AFTER PAGE LOADS');
           setShowAccessDenied(false);
           setAccessGranted(true);
         } else {
-          console.log('PersistentWebView: No mobileapp parameter or invalid value - navbar remains hidden until granted');
+          console.log('PersistentWebView (Android): No mobileapp parameter or invalid value - navbar remains hidden until granted');
         }
       } else {
-        console.log('PersistentWebView: No URL parameters found - navbar remains hidden until granted');
+        console.log('PersistentWebView (Android): No URL parameters found - navbar remains hidden until granted');
       }
     }
   }, [setShowAccessDenied, setAccessGranted, setCurrentUrl, setIsWebViewLoaded]);
 
   const handleLoadStart = () => {
-    console.log('PersistentWebView: Load started - hiding navbar');
+    console.log('PersistentWebView (Android): Load started - hiding navbar');
     setIsLoading(true);
   };
 
   const handleLoadEnd = () => {
-    console.log('PersistentWebView: Load ended - page fully loaded, navbar can now show if access granted');
+    console.log('PersistentWebView (Android): Load ended - page fully loaded, navbar can now show if access granted');
     setIsLoading(false);
     setIsWebViewLoaded(true);
   };
 
   const handleError = (syntheticEvent: any) => {
     const { nativeEvent } = syntheticEvent;
-    console.log('PersistentWebView: Error occurred:', nativeEvent);
+    console.log('PersistentWebView (Android): Error occurred:', nativeEvent);
     setIsLoading(false);
     setIsWebViewLoaded(false);
   };
 
   const handleContactTeam = useCallback(() => {
     const whatsappUrl = 'https://wa.me/9720584422101?text=%E2%80%8E%20%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3%20%D7%AA%D7%95%D7%9B%D7%9F%20%D7%9C%D7%97%D7%91%D7%99%D7%9C%D7%AA%20%D7%94%D7%94%D7%9B%D7%A0%D7%94%20%D7%9C%D7%98%D7%A1%D7%98%20%D7%A9%D7%9C%D7%99';
-    console.log('PersistentWebView: Opening WhatsApp contact link');
+    console.log('PersistentWebView (Android): Opening WhatsApp contact link');
     Linking.openURL(whatsappUrl).catch(err => {
-      console.error('PersistentWebView: Failed to open WhatsApp link:', err);
+      console.error('PersistentWebView (Android): Failed to open WhatsApp link:', err);
     });
   }, []);
 
@@ -148,7 +148,7 @@ export default function PersistentWebView() {
           onError={handleError}
           onNavigationStateChange={handleNavigationStateChange}
           onLoad={() => {
-            console.log('PersistentWebView: WebView loaded successfully');
+            console.log('PersistentWebView (Android): WebView loaded successfully');
           }}
           javaScriptEnabled={true}
           domStorageEnabled={true}
@@ -157,8 +157,11 @@ export default function PersistentWebView() {
           scrollEnabled={true}
           injectedJavaScript={injectedJavaScript}
           onMessage={(event) => {
-            console.log('PersistentWebView: Message from WebView:', event.nativeEvent.data);
+            console.log('PersistentWebView (Android): Message from WebView:', event.nativeEvent.data);
           }}
+          // Android-specific props for better performance
+          androidHardwareAccelerationDisabled={false}
+          androidLayerType="hardware"
         />
       </View>
 
