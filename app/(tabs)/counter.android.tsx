@@ -55,22 +55,21 @@ export default function CounterScreen() {
       const savedDate = await SecureStore.getItemAsync(STORAGE_KEY);
       if (savedDate) {
         const date = new Date(savedDate);
-        console.log('Loaded saved date from SecureStore (Android):', date);
+        console.log('Loaded saved date:', date);
         setStartDate(date);
         setDatePickerExpanded(false);
       }
     } catch (error) {
-      console.log('Error loading date (Android):', error);
+      console.log('Error loading date:', error);
     }
   };
 
   const saveStartDate = async (date: Date) => {
     try {
-      const dateString = date.toISOString();
-      await SecureStore.setItemAsync(STORAGE_KEY, dateString);
-      console.log('Saved date to SecureStore (Android):', date);
+      await SecureStore.setItemAsync(STORAGE_KEY, date.toISOString());
+      console.log('Saved date:', date);
     } catch (error) {
-      console.log('Error saving date (Android):', error);
+      console.log('Error saving date:', error);
     }
   };
 
@@ -84,7 +83,7 @@ export default function CounterScreen() {
     const isToday = startDateNormalized.getTime() === today.getTime();
     
     if (isToday) {
-      console.log('Selected date is today - setting stages to 0% (Android)');
+      console.log('Selected date is today - setting stages to 0%');
       const actualStartDate = new Date(start);
       actualStartDate.setDate(actualStartDate.getDate() + 1);
 
@@ -147,7 +146,7 @@ export default function CounterScreen() {
 
     const showNotification = daysRemaining <= 30 && daysRemaining > 0;
 
-    console.log('Calculated dates (Android) - Stage 1 remaining:', stage1Remaining, 'Stage 2 remaining:', stage2Remaining);
+    console.log('Calculated dates - Stage 1 remaining:', stage1Remaining, 'Stage 2 remaining:', stage2Remaining);
 
     setCalculatedDates({
       threeMonths: threeMonthsDate,
@@ -164,7 +163,7 @@ export default function CounterScreen() {
   }, []);
 
   const handleDateSelect = (date: Date) => {
-    console.log('User selected date (Android):', date);
+    console.log('User selected date:', date);
     setStartDate(date);
     saveStartDate(date);
     setDatePickerExpanded(false);
@@ -178,7 +177,7 @@ export default function CounterScreen() {
   };
 
   const handleClearDate = () => {
-    console.log('User tapped clear date button (Android)');
+    console.log('User tapped clear date button');
     Alert.alert(
       'מחיקת תאריך',
       'האם אתה בטוח שברצונך למחוק את התאריך?',
@@ -188,7 +187,7 @@ export default function CounterScreen() {
           text: 'מחק',
           style: 'destructive',
           onPress: async () => {
-            console.log('Clearing saved date (Android)');
+            console.log('Clearing saved date');
             setStartDate(null);
             setCalculatedDates(null);
             setDatePickerExpanded(true);
@@ -200,7 +199,7 @@ export default function CounterScreen() {
   };
 
   const handleToggleView = () => {
-    console.log('User toggled view mode (Android) from', viewMode, 'to', viewMode === 'stages' ? 'total' : 'stages');
+    console.log('User toggled view mode from', viewMode, 'to', viewMode === 'stages' ? 'total' : 'stages');
     const newMode = viewMode === 'stages' ? 'total' : 'stages';
     setViewMode(newMode);
   };
@@ -250,15 +249,19 @@ export default function CounterScreen() {
   };
 
   const datePickerTitle = 'תשלום אגרת היתר נהיגה';
+
   const stagesButtonText = 'לפי שלבי ליווי';
   const totalButtonText = 'סה"כ';
+
   const totalDaysRemaining = getTotalDaysRemaining();
   const totalProgress = getTotalProgress();
   const totalDaysRemainingText = String(totalDaysRemaining);
   const totalProgressPercentText = `${Math.round(totalProgress)}%`;
+
   const isFullyCompleted = calculatedDates && calculatedDates.currentStage === 'completed' && totalDaysRemaining === 0;
   const completionTitle = 'סיימת מלווה!';
   const completionSubtitle = 'תהנה עם הרישיון';
+
   const totalCircleColor = isFullyCompleted ? '#4CAF50' : '#4FC3F7';
 
   return (
@@ -267,114 +270,7 @@ export default function CounterScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>ספירת ימי מלווה</Text>
-        </View>
-
-        {datePickerExpanded ? (
-          <View style={styles.dateCard}>
-            <View style={styles.dateCardHeader}>
-              <Text style={styles.dateCardTitle}>{datePickerTitle}</Text>
-              <IconSymbol
-                ios_icon_name="calendar"
-                android_material_icon_name="calendar-today"
-                size={24}
-                color={colors.primary}
-              />
-            </View>
-            
-            <View style={styles.infoBox}>
-              <IconSymbol
-                ios_icon_name="info.circle.fill"
-                android_material_icon_name="info"
-                size={18}
-                color="#4FC3F7"
-              />
-              <Text style={styles.infoText}>
-                מדובר בתאריך בו שילמת את האגרה - לא בתאריך מעבר הטסט
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.dateButton}
-              onPress={() => {
-                console.log('User tapped select date button (Android)');
-                setShowPicker(true);
-              }}
-            >
-              <IconSymbol
-                ios_icon_name="chevron.down"
-                android_material_icon_name="arrow-drop-down"
-                size={24}
-                color={colors.textSecondary}
-              />
-              <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
-            </TouchableOpacity>
-
-            {startDate && (
-              <>
-                <TouchableOpacity
-                  style={styles.clearButton}
-                  onPress={handleClearDate}
-                >
-                  <Text style={styles.clearButtonText}>מחק תאריך</Text>
-                  <IconSymbol
-                    ios_icon_name="trash"
-                    android_material_icon_name="delete"
-                    size={16}
-                    color={colors.textSecondary}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.collapseButton}
-                  onPress={() => {
-                    console.log('User tapped to collapse date picker (Android)');
-                    setDatePickerExpanded(false);
-                  }}
-                >
-                  <Text style={styles.collapseButtonText}>כווץ</Text>
-                  <IconSymbol
-                    ios_icon_name="chevron.up"
-                    android_material_icon_name="expand-less"
-                    size={18}
-                    color={colors.textSecondary}
-                  />
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        ) : (
-          <TouchableOpacity
-            style={styles.dateCardCollapsed}
-            onPress={() => {
-              console.log('User tapped to expand date picker (Android)');
-              setDatePickerExpanded(true);
-            }}
-          >
-            <View style={styles.collapsedContent}>
-              <View style={styles.collapsedLeft}>
-                <IconSymbol
-                  ios_icon_name="calendar"
-                  android_material_icon_name="calendar-today"
-                  size={28}
-                  color={colors.primary}
-                />
-              </View>
-              <View style={styles.collapsedCenter}>
-                <Text style={styles.collapsedTitle}>{datePickerTitle}</Text>
-                <Text style={styles.collapsedDateValue}>{startDateDisplay}</Text>
-              </View>
-              <View style={styles.collapsedRight}>
-                <IconSymbol
-                  ios_icon_name="chevron.down"
-                  android_material_icon_name="expand-more"
-                  size={24}
-                  color={colors.textSecondary}
-                />
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
+        <View style={styles.topSpacer} />
 
         {calculatedDates && (
           <>
@@ -430,7 +326,7 @@ export default function CounterScreen() {
                     <TouchableOpacity
                       style={styles.stageCardCollapsed}
                       onPress={() => {
-                        console.log('User tapped to expand Stage 1 (Android)');
+                        console.log('User tapped to expand Stage 1');
                         setStage1Expanded(true);
                       }}
                     >
@@ -512,7 +408,7 @@ export default function CounterScreen() {
                         <TouchableOpacity
                           style={styles.collapseButton}
                           onPress={() => {
-                            console.log('User tapped to collapse Stage 1 (Android)');
+                            console.log('User tapped to collapse Stage 1');
                             setStage1Expanded(false);
                           }}
                         >
@@ -532,7 +428,7 @@ export default function CounterScreen() {
                     <TouchableOpacity
                       style={styles.stageCardCollapsed}
                       onPress={() => {
-                        console.log('User tapped to expand Stage 2 (Android)');
+                        console.log('User tapped to expand Stage 2');
                         setStage2Expanded(true);
                       }}
                     >
@@ -614,7 +510,7 @@ export default function CounterScreen() {
                         <TouchableOpacity
                           style={styles.collapseButton}
                           onPress={() => {
-                            console.log('User tapped to collapse Stage 2 (Android)');
+                            console.log('User tapped to collapse Stage 2');
                             setStage2Expanded(false);
                           }}
                         >
@@ -798,6 +694,111 @@ export default function CounterScreen() {
             </Text>
           </View>
         )}
+
+        {datePickerExpanded ? (
+          <View style={styles.dateCard}>
+            <View style={styles.dateCardHeader}>
+              <Text style={styles.dateCardTitle}>{datePickerTitle}</Text>
+              <IconSymbol
+                ios_icon_name="calendar"
+                android_material_icon_name="calendar-today"
+                size={24}
+                color={colors.primary}
+              />
+            </View>
+            
+            <View style={styles.infoBox}>
+              <IconSymbol
+                ios_icon_name="info.circle.fill"
+                android_material_icon_name="info"
+                size={18}
+                color="#4FC3F7"
+              />
+              <Text style={styles.infoText}>
+                מדובר בתאריך בו שילמת את האגרה - לא בתאריך מעבר הטסט
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={() => {
+                console.log('User tapped select date button');
+                setShowPicker(true);
+              }}
+            >
+              <IconSymbol
+                ios_icon_name="chevron.down"
+                android_material_icon_name="arrow-drop-down"
+                size={24}
+                color={colors.textSecondary}
+              />
+              <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
+            </TouchableOpacity>
+
+            {startDate && (
+              <>
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={handleClearDate}
+                >
+                  <Text style={styles.clearButtonText}>מחק תאריך</Text>
+                  <IconSymbol
+                    ios_icon_name="trash"
+                    android_material_icon_name="delete"
+                    size={16}
+                    color={colors.textSecondary}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.collapseButton}
+                  onPress={() => {
+                    console.log('User tapped to collapse date picker');
+                    setDatePickerExpanded(false);
+                  }}
+                >
+                  <Text style={styles.collapseButtonText}>כווץ</Text>
+                  <IconSymbol
+                    ios_icon_name="chevron.up"
+                    android_material_icon_name="expand-less"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={styles.dateCardCollapsed}
+            onPress={() => {
+              console.log('User tapped to expand date picker');
+              setDatePickerExpanded(true);
+            }}
+          >
+            <View style={styles.collapsedContent}>
+              <View style={styles.collapsedLeft}>
+                <IconSymbol
+                  ios_icon_name="calendar"
+                  android_material_icon_name="calendar-today"
+                  size={28}
+                  color={colors.primary}
+                />
+              </View>
+              <View style={styles.collapsedCenter}>
+                <Text style={styles.collapsedTitle}>{datePickerTitle}</Text>
+                <Text style={styles.collapsedDateValue}>{startDateDisplay}</Text>
+              </View>
+              <View style={styles.collapsedRight}>
+                <IconSymbol
+                  ios_icon_name="chevron.down"
+                  android_material_icon_name="expand-more"
+                  size={24}
+                  color={colors.textSecondary}
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       <CustomDatePicker
@@ -815,7 +816,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: 0,
   },
   scrollView: {
     flex: 1,
@@ -824,15 +824,8 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 120,
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 28,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: colors.text,
-    textAlign: 'center',
+  topSpacer: {
+    height: 28,
   },
   toggleContainer: {
     flexDirection: 'row-reverse',
@@ -870,6 +863,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
     marginBottom: 20,
+    shadowColor: '#4FC3F7',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
     elevation: 10,
   },
   totalCircleContent: {
@@ -893,6 +890,18 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: '600',
     marginTop: 4,
+  },
+  totalStageIndicator: {
+    backgroundColor: '#4FC3F7',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginTop: 12,
+  },
+  totalStageText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   completionContainer: {
     alignItems: 'center',
@@ -926,10 +935,18 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 2,
     borderColor: '#4FC3F7',
+    shadowColor: '#4FC3F7',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
     elevation: 6,
   },
   totalCardCompleted: {
     borderColor: '#4CAF50',
+    shadowColor: '#4CAF50',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
     elevation: 6,
   },
   completedCheckmarkContainer: {
@@ -1064,18 +1081,26 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 20,
     padding: 20,
-    marginBottom: 24,
+    marginTop: 24,
     borderWidth: 1,
     borderColor: colors.border,
+    shadowColor: '#4FC3F7',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
     elevation: 4,
   },
   dateCardCollapsed: {
     backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 24,
+    marginTop: 24,
     borderWidth: 1,
     borderColor: colors.border,
+    shadowColor: '#4FC3F7',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
     elevation: 2,
   },
   dateCardHeader: {
@@ -1144,16 +1169,28 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 2,
     borderColor: colors.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
     elevation: 3,
   },
   stageCardActive: {
     borderColor: '#4FC3F7',
     borderWidth: 2,
+    shadowColor: '#4FC3F7',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
     elevation: 6,
   },
   stageCardCompleted: {
     borderColor: '#4CAF50',
     borderWidth: 2,
+    shadowColor: '#4CAF50',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
     elevation: 5,
   },
   stageCardCollapsed: {
@@ -1162,6 +1199,10 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 2,
     borderColor: '#4CAF50',
+    shadowColor: '#4CAF50',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
     elevation: 3,
   },
   collapsedContent: {
