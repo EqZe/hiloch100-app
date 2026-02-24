@@ -1,21 +1,18 @@
 
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Linking, I18nManager, Image } from 'react-native';
 import { WebView, WebViewNavigation } from 'react-native-webview';
 import { useWebView } from '@/contexts/WebViewContext';
 import { colors } from '@/styles/commonStyles';
 import LottieView from 'lottie-react-native';
-import { usePathname } from 'expo-router';
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
 export default function PersistentWebView() {
   const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted, setCurrentUrl, setIsWebViewLoaded, currentUrl } = useWebView();
-  const pathname = usePathname();
   const previousUrlRef = useRef<string>('');
   
-  const isVisible = pathname.includes('/course');
   const isOnHilochHomepage = currentUrl === 'https://hiloch100.co.il/' || currentUrl === 'https://hiloch100.co.il';
 
   const injectedJavaScript = isOnHilochHomepage ? `
@@ -43,10 +40,6 @@ export default function PersistentWebView() {
     })();
     true;
   ` : '';
-
-  useEffect(() => {
-    console.log('PersistentWebView (Android): Current pathname:', pathname, 'Visible:', isVisible);
-  }, [pathname, isVisible]);
 
   const handleNavigationStateChange = useCallback((navState: WebViewNavigation) => {
     const newUrl = navState.url;
@@ -136,10 +129,7 @@ export default function PersistentWebView() {
   const descriptionText = 'ניתן לפנות לצוות האתר לצורך שדרוג החבילה';
   const buttonText = 'צור קשר עם הצוות';
 
-  if (!isVisible) {
-    console.log('PersistentWebView (Android): Not visible, returning null');
-    return null;
-  }
+  console.log('PersistentWebView (Android): Rendering WebView - always visible when mounted');
 
   return (
     <View style={styles.container}>
