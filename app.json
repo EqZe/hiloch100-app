@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "\u05d4\u05d9\u05dc\u05d5\u05da \u05de\u05d0\u05d4",
-    "slug": "\u05d4\u05d9\u05dc\u05d5\u05da \u05de\u05d0\u05d4",
+    "slug": "hiloch100",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/\u05d0\u05d9\u05e0\u05e1\u05d8\u05d2\u05e8\u05dd \u05dc\u05d5\u05d2\u05d5 \u05d0\u05d5\u05d2\u05d5\u05e1\u05d8 2022.jpg",
@@ -25,7 +25,7 @@
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.Natively"
+      "package": "com.hilochapp.co.il"
     },
     "web": {
       "favicon": "./assets/images/final_quest_240x240.png",
@@ -42,7 +42,7 @@
     },
     "extra": {
       "router": {},
-      "backendUrl": "https://8wqjkm6c9ckqyxeb4cc8c9tuy4p4fkgw.app.specular.dev"
+      "backendUrl": "https://prod-proj-zpefk6csypq6ngym4bbcw-liwg5h36mq-ey.a.run.app"
     }
   }
 }

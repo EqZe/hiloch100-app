@@ -129,7 +129,7 @@ export default function PersistentWebView() {
   }, [webViewRef]);
 
   const handleContactTeam = useCallback(() => {
-    const whatsappUrl = 'https://wa.me/9720584422101?text=%E2%80%8E%20%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3%20%D7%AA%D7%95%D7%9B%D7%9F%20%D7%9C%D7%97%D7%91%D7%99%D7%9C%D7%AA%20%D7%94%D7%94%D7%9B%D7%A0%D7%94%20%D7%9C%D7%98%D7%A1%D7%98%20%D7%A9%D7%9C%D7%99';
+    const whatsappUrl = 'https://wa.me/9720555565715?text=%E2%80%8E%20%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3%20%D7%AA%D7%95%D7%9B%D7%9F%20%D7%9C%D7%97%D7%91%D7%99%D7%9C%D7%AA%20%D7%94%D7%94%D7%9B%D7%A0%D7%94%20%D7%9C%D7%98%D7%A1%D7%98%20%D7%A9%D7%9C%D7%99';
     console.log('PersistentWebView (Android): Opening WhatsApp contact link');
     Linking.openURL(whatsappUrl).catch(err => {
       console.error('PersistentWebView (Android): Failed to open WhatsApp link:', err);
@@ -138,7 +138,7 @@ export default function PersistentWebView() {
 
   const bigTitleText = 'אופס... נכנסת באין כניסה!';
   const subtitleText = 'אינך זכאי להשתמש באפליקציית המובייל של הילוך מאה';
-  const descriptionText = 'ניתן לפנות לצוות האתר לצורך שדרוג החבילה';
+  const descriptionText = 'למידע נוסף, יש לפנות לתמיכה';
   const buttonText = 'צור קשר עם הצוות';
 
   console.log('PersistentWebView (Android): Rendering WebView - always visible when mounted');
