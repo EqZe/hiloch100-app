@@ -15,7 +15,7 @@ export default function PersistentWebView() {
   const pathname = usePathname();
   const previousUrlRef = useRef<string>('');
   
-  const isVisible = pathname === '/(tabs)/course' || pathname === '/course';
+  const isVisible = pathname.includes('/course');
   const isOnHilochHomepage = currentUrl === 'https://hiloch100.co.il/' || currentUrl === 'https://hiloch100.co.il';
 
   const injectedJavaScript = isOnHilochHomepage ? `
@@ -136,8 +136,13 @@ export default function PersistentWebView() {
   const descriptionText = 'ניתן לפנות לצוות האתר לצורך שדרוג החבילה';
   const buttonText = 'צור קשר עם הצוות';
 
+  if (!isVisible) {
+    console.log('PersistentWebView (Android): Not visible, returning null');
+    return null;
+  }
+
   return (
-    <View style={[styles.container, !isVisible && styles.hidden]}>
+    <View style={styles.container}>
       <View style={[styles.webviewContainer, showAccessDenied && styles.webviewHidden]}>
         <WebView
           ref={webViewRef}
@@ -159,7 +164,6 @@ export default function PersistentWebView() {
           onMessage={(event) => {
             console.log('PersistentWebView (Android): Message from WebView:', event.nativeEvent.data);
           }}
-          // Android-specific props for better performance
           androidHardwareAccelerationDisabled={false}
           androidLayerType="hardware"
         />
@@ -205,16 +209,8 @@ export default function PersistentWebView() {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     backgroundColor: colors.background,
-  },
-  hidden: {
-    opacity: 0,
-    pointerEvents: 'none',
   },
   webviewContainer: {
     flex: 1,
