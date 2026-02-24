@@ -97,15 +97,14 @@ export default function FloatingTabBar({
 
   const indicatorStyle = useAnimatedStyle(() => {
     const tabWidth = (containerWidth - 16) / tabs.length;
-    // For RTL, we need to reverse the direction
+    // For RTL with row-reverse, the visual position is reversed
+    // So we need to calculate position from right to left
+    const visualIndex = tabs.length - 1 - animatedValue.value;
+    
     return {
       transform: [
         {
-          translateX: interpolate(
-            animatedValue.value,
-            [0, tabs.length - 1],
-            [tabWidth * (tabs.length - 1), 0] // Reversed for RTL
-          ),
+          translateX: visualIndex * tabWidth,
         },
       ],
     };
@@ -207,12 +206,12 @@ const styles = StyleSheet.create({
   indicator: {
     position: 'absolute',
     top: 6,
-    right: 8, // Changed from left to right for RTL
+    right: 8,
     bottom: 6,
     borderRadius: 18,
   },
   tabsContainer: {
-    flexDirection: 'row-reverse', // RTL: reversed direction
+    flexDirection: 'row-reverse',
     height: 68,
     alignItems: 'center',
     paddingHorizontal: 8,
