@@ -116,6 +116,21 @@ export default function PersistentWebView() {
     setIsWebViewLoaded(false);
   };
 
+  const handleShouldStartLoadWithRequest = useCallback((request: any) => {
+    console.log('PersistentWebView (Android): shouldStartLoadWithRequest:', request.url);
+    return true;
+  }, []);
+
+  const handleOpenWindow = useCallback((syntheticEvent: any) => {
+    const { nativeEvent } = syntheticEvent;
+    const targetUrl = nativeEvent.targetUrl;
+    console.log('PersistentWebView (Android): onOpenWindow triggered - redirecting to:', targetUrl);
+    
+    if (webViewRef.current && targetUrl) {
+      webViewRef.current.injectJavaScript(`window.location.href = "${targetUrl}"; true;`);
+    }
+  }, [webViewRef]);
+
   const handleContactTeam = useCallback(() => {
     const whatsappUrl = 'https://wa.me/9720584422101?text=%E2%80%8E%20%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3%20%D7%AA%D7%95%D7%9B%D7%9F%20%D7%9C%D7%97%D7%91%D7%99%D7%9C%D7%AA%20%D7%94%D7%94%D7%9B%D7%A0%D7%94%20%D7%9C%D7%98%D7%A1%D7%98%20%D7%A9%D7%9C%D7%99';
     console.log('PersistentWebView (Android): Opening WhatsApp contact link');
@@ -156,6 +171,9 @@ export default function PersistentWebView() {
           }}
           androidHardwareAccelerationDisabled={false}
           androidLayerType="hardware"
+          setSupportMultipleWindows={false}
+          onOpenWindow={handleOpenWindow}
+          shouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
         />
       </View>
 
