@@ -306,18 +306,21 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: '600',
     marginBottom: 8,
+    textAlign: 'center',
   },
   mainNumber: {
     fontSize: 72,
     fontWeight: '900',
     color: colors.text,
     lineHeight: 80,
+    textAlign: 'center',
   },
   mainLabel: {
     fontSize: 16,
     color: colors.textSecondary,
     fontWeight: '600',
     marginTop: 4,
+    textAlign: 'center',
   },
   stageIndicator: {
     backgroundColor: '#4FC3F7',
@@ -330,6 +333,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
+    textAlign: 'center',
   },
   completionContainer: {
     alignItems: 'center',
@@ -393,7 +397,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4FC3F7',
     borderRadius: 6,
     position: 'absolute',
-    left: 0,
+    right: 0,
     top: 0,
     bottom: 0,
     fontWeight: '900',

@@ -306,6 +306,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: colors.text,
+    textAlign: 'center',
   },
   pickerItemTextSelected: {
     color: '#FFFFFF',
@@ -329,6 +330,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: colors.text,
+    textAlign: 'center',
   },
   confirmButton: {
     flex: 1,
@@ -341,5 +343,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',
+    textAlign: 'center',
   },
 });
