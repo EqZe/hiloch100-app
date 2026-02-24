@@ -264,6 +264,11 @@ export default function CounterScreen() {
 
   const totalCircleColor = isFullyCompleted ? '#4CAF50' : '#4FC3F7';
 
+  const stage1RemainingText = String(calculatedDates?.stage1Remaining || 0);
+  const stage2RemainingText = String(calculatedDates?.stage2Remaining || 0);
+  const stage1ProgressText = `${Math.round(stage1Progress)}%`;
+  const stage2ProgressText = `${Math.round(stage2Progress)}%`;
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView
@@ -360,10 +365,6 @@ export default function CounterScreen() {
                       isStage1Completed && styles.stageCardCompleted
                     ]}>
                       <View style={styles.stageHeader}>
-                        <View style={styles.stageTitleContainer}>
-                          <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
-                          <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
-                        </View>
                         <View style={styles.stageIconContainer}>
                           <IconSymbol
                             ios_icon_name="person.fill"
@@ -372,6 +373,10 @@ export default function CounterScreen() {
                             color={calculatedDates.currentStage === 1 ? '#4FC3F7' : isStage1Completed ? '#4CAF50' : '#8E8E93'}
                           />
                         </View>
+                        <View style={styles.stageTitleContainer}>
+                          <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
+                          <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
+                        </View>
                       </View>
 
                       <View style={styles.requirementBox}>
@@ -379,22 +384,22 @@ export default function CounterScreen() {
                       </View>
 
                       <View style={styles.progressContainer}>
+                        <Text style={styles.progressText}>
+                          {stage1ProgressText}
+                        </Text>
                         <View style={styles.progressBar}>
                           <View style={[styles.progressFill, { width: `${stage1Progress}%`, backgroundColor: isStage1Completed ? '#4CAF50' : '#4FC3F7' }]} />
                         </View>
-                        <Text style={styles.progressText}>
-                          {Math.round(stage1Progress)}%
-                        </Text>
                       </View>
 
                       <View style={styles.stageDetails}>
                         <View style={styles.detailRow}>
+                          <Text style={styles.detailValue}>{stage1RemainingText}</Text>
                           <Text style={styles.detailLabel}>ימים שנותרו</Text>
-                          <Text style={styles.detailValue}>{calculatedDates.stage1Remaining}</Text>
                         </View>
                         <View style={styles.detailRow}>
-                          <Text style={styles.detailLabel}>תאריך סיום</Text>
                           <Text style={styles.detailValue}>{threeMonthsDisplay}</Text>
+                          <Text style={styles.detailLabel}>תאריך סיום</Text>
                         </View>
                       </View>
 
@@ -462,10 +467,6 @@ export default function CounterScreen() {
                       isStage2Completed && styles.stageCardCompleted
                     ]}>
                       <View style={styles.stageHeader}>
-                        <View style={styles.stageTitleContainer}>
-                          <Text style={styles.stageTitle}>שלב 2 - מלווה לילה</Text>
-                          <Text style={styles.stageSubtitle}>3 חודשים נוספים</Text>
-                        </View>
                         <View style={styles.stageIconContainer}>
                           <IconSymbol
                             ios_icon_name="moon.fill"
@@ -474,6 +475,10 @@ export default function CounterScreen() {
                             color={calculatedDates.currentStage === 2 ? '#4FC3F7' : isStage2Completed ? '#4CAF50' : '#8E8E93'}
                           />
                         </View>
+                        <View style={styles.stageTitleContainer}>
+                          <Text style={styles.stageTitle}>שלב 2 - מלווה לילה</Text>
+                          <Text style={styles.stageSubtitle}>3 חודשים נוספים</Text>
+                        </View>
                       </View>
 
                       <View style={styles.requirementBox}>
@@ -481,22 +486,22 @@ export default function CounterScreen() {
                       </View>
 
                       <View style={styles.progressContainer}>
+                        <Text style={styles.progressText}>
+                          {stage2ProgressText}
+                        </Text>
                         <View style={styles.progressBar}>
                           <View style={[styles.progressFill, { width: `${stage2Progress}%`, backgroundColor: isStage2Completed ? '#4CAF50' : '#4FC3F7' }]} />
                         </View>
-                        <Text style={styles.progressText}>
-                          {Math.round(stage2Progress)}%
-                        </Text>
                       </View>
 
                       <View style={styles.stageDetails}>
                         <View style={styles.detailRow}>
+                          <Text style={styles.detailValue}>{stage2RemainingText}</Text>
                           <Text style={styles.detailLabel}>ימים שנותרו</Text>
-                          <Text style={styles.detailValue}>{calculatedDates.stage2Remaining}</Text>
                         </View>
                         <View style={styles.detailRow}>
-                          <Text style={styles.detailLabel}>תאריך סיום</Text>
                           <Text style={styles.detailValue}>{sixMonthsDisplay}</Text>
+                          <Text style={styles.detailLabel}>תאריך סיום</Text>
                         </View>
                       </View>
 
@@ -576,10 +581,6 @@ export default function CounterScreen() {
                   )}
 
                   <View style={styles.totalHeader}>
-                    <View style={styles.totalTitleContainer}>
-                      <Text style={styles.totalTitle}>סה"כ תקופת מלווה</Text>
-                      <Text style={styles.totalSubtitle}>6 חודשים</Text>
-                    </View>
                     <View style={styles.totalIconContainer}>
                       <IconSymbol
                         ios_icon_name="calendar"
@@ -587,6 +588,10 @@ export default function CounterScreen() {
                         size={32}
                         color={isFullyCompleted ? '#4CAF50' : '#4FC3F7'}
                       />
+                    </View>
+                    <View style={styles.totalTitleContainer}>
+                      <Text style={styles.totalTitle}>סה"כ תקופת מלווה</Text>
+                      <Text style={styles.totalSubtitle}>6 חודשים</Text>
                     </View>
                   </View>
 
@@ -613,6 +618,9 @@ export default function CounterScreen() {
                   </View>
 
                   <View style={styles.totalProgressContainer}>
+                    <Text style={styles.totalProgressText}>
+                      {totalProgressPercentText}
+                    </Text>
                     <View style={styles.totalProgressBar}>
                       <View style={[
                         styles.totalProgressFill,
@@ -622,23 +630,20 @@ export default function CounterScreen() {
                         }
                       ]} />
                     </View>
-                    <Text style={styles.totalProgressText}>
-                      {totalProgressPercentText}
-                    </Text>
                   </View>
 
                   <View style={styles.totalDetails}>
                     <View style={styles.totalDetailRow}>
-                      <Text style={styles.totalDetailLabel}>תאריך התחלה</Text>
                       <Text style={styles.totalDetailValue}>{startDateDisplay}</Text>
+                      <Text style={styles.totalDetailLabel}>תאריך התחלה</Text>
                     </View>
                     <View style={styles.totalDetailRow}>
-                      <Text style={styles.totalDetailLabel}>תאריך סיום</Text>
                       <Text style={styles.totalDetailValue}>{sixMonthsDisplay}</Text>
+                      <Text style={styles.totalDetailLabel}>תאריך סיום</Text>
                     </View>
                     <View style={styles.totalDetailRow}>
-                      <Text style={styles.totalDetailLabel}>סה"כ ימים</Text>
                       <Text style={styles.totalDetailValue}>{calculatedDates.stage1Total + calculatedDates.stage2Total}</Text>
+                      <Text style={styles.totalDetailLabel}>סה"כ ימים</Text>
                     </View>
                   </View>
 
@@ -664,13 +669,13 @@ export default function CounterScreen() {
             {calculatedDates.showNotification && (
               <View style={styles.notificationCard}>
                 <View style={styles.notificationHeader}>
-                  <Text style={styles.notificationTitle}>תזכורת חשובה</Text>
                   <IconSymbol
                     ios_icon_name="exclamationmark.triangle.fill"
                     android_material_icon_name="warning"
                     size={28}
                     color="#FF9800"
                   />
+                  <Text style={styles.notificationTitle}>תזכורת חשובה</Text>
                 </View>
                 <Text style={styles.notificationText}>
                   מומלץ לבצע הצהרת סיום מלווה בתנאי שבוצע בהתאם לחוק
@@ -698,13 +703,13 @@ export default function CounterScreen() {
         {datePickerExpanded ? (
           <View style={styles.dateCard}>
             <View style={styles.dateCardHeader}>
-              <Text style={styles.dateCardTitle}>{datePickerTitle}</Text>
               <IconSymbol
                 ios_icon_name="calendar"
                 android_material_icon_name="calendar-today"
                 size={24}
                 color={colors.primary}
               />
+              <Text style={styles.dateCardTitle}>{datePickerTitle}</Text>
             </View>
             
             <View style={styles.infoBox}>
@@ -726,13 +731,13 @@ export default function CounterScreen() {
                 setShowPicker(true);
               }}
             >
+              <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
               <IconSymbol
                 ios_icon_name="chevron.down"
                 android_material_icon_name="arrow-drop-down"
                 size={24}
                 color={colors.textSecondary}
               />
-              <Text style={styles.dateButtonText}>{startDateDisplay}</Text>
             </TouchableOpacity>
 
             {startDate && (
@@ -741,13 +746,13 @@ export default function CounterScreen() {
                   style={styles.clearButton}
                   onPress={handleClearDate}
                 >
-                  <Text style={styles.clearButtonText}>מחק תאריך</Text>
                   <IconSymbol
                     ios_icon_name="trash"
                     android_material_icon_name="delete"
                     size={16}
                     color={colors.textSecondary}
                   />
+                  <Text style={styles.clearButtonText}>מחק תאריך</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.collapseButton}
@@ -756,13 +761,13 @@ export default function CounterScreen() {
                     setDatePickerExpanded(false);
                   }}
                 >
-                  <Text style={styles.collapseButtonText}>כווץ</Text>
                   <IconSymbol
                     ios_icon_name="chevron.up"
                     android_material_icon_name="expand-less"
                     size={18}
                     color={colors.textSecondary}
                   />
+                  <Text style={styles.collapseButtonText}>כווץ</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -878,18 +883,21 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: '600',
     marginBottom: 8,
+    textAlign: 'center',
   },
   totalMainNumber: {
     fontSize: 72,
     fontWeight: '900',
     color: colors.text,
     lineHeight: 80,
+    textAlign: 'center',
   },
   totalMainLabel: {
     fontSize: 16,
     color: colors.textSecondary,
     fontWeight: '600',
     marginTop: 4,
+    textAlign: 'center',
   },
   totalStageIndicator: {
     backgroundColor: '#4FC3F7',
@@ -902,6 +910,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
+    textAlign: 'center',
   },
   completionContainer: {
     alignItems: 'center',
@@ -1337,7 +1346,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 12,
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
   },
   currentBadgeText: {
     fontSize: 13,
