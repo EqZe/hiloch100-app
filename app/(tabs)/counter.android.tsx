@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  I18nManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as SecureStore from 'expo-secure-store';
@@ -18,9 +17,6 @@ import GamifiedCounter from '@/components/GamifiedCounter';
 import CircularProgress from '@/components/CircularProgress';
 
 const STORAGE_KEY = 'start_date';
-
-I18nManager.allowRTL(true);
-I18nManager.forceRTL(true);
 
 export default function CounterScreen() {
   const [startDate, setStartDate] = useState<Date | null>(null);

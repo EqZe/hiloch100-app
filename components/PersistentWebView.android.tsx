@@ -1,13 +1,10 @@
 
 import React, { useCallback, useRef } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Linking, I18nManager, Image } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Linking, Image } from 'react-native';
 import { WebView, WebViewNavigation } from 'react-native-webview';
 import { useWebView } from '@/contexts/WebViewContext';
 import { colors } from '@/styles/commonStyles';
 import LottieView from 'lottie-react-native';
-
-I18nManager.allowRTL(true);
-I18nManager.forceRTL(true);
 
 export default function PersistentWebView() {
   const { webViewRef, isLoading, setIsLoading, showAccessDenied, setShowAccessDenied, accessGranted, setAccessGranted, setCurrentUrl, setIsWebViewLoaded, currentUrl } = useWebView();

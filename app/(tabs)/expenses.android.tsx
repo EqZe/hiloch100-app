@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
-  I18nManager,
   TextInput,
   Alert,
 } from 'react-native';
@@ -16,10 +15,6 @@ import { colors } from '@/styles/commonStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { IconSymbol } from '@/components/IconSymbol';
 import CustomDatePicker from '@/components/CustomDatePicker';
-
-// Force RTL layout for Android
-I18nManager.allowRTL(true);
-I18nManager.forceRTL(true);
 
 const STORAGE_KEY = 'driving_expenses';
 
@@ -534,7 +529,7 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   header: {
-    flexDirection: 'row-reverse', // RTL
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -616,13 +611,13 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   expenseHeader: {
-    flexDirection: 'row-reverse', // RTL
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
   },
   expenseActions: {
-    flexDirection: 'row-reverse', // RTL
+    flexDirection: 'row-reverse',
     gap: 12,
   },
   actionButton: {
@@ -634,15 +629,15 @@ const styles = StyleSheet.create({
     color: colors.text,
     flex: 1,
     textAlign: 'right',
-    marginLeft: 12, // Changed from marginRight for RTL
+    marginLeft: 12,
   },
   expenseDetails: {
-    flexDirection: 'row-reverse', // RTL
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   expenseDetailRow: {
-    flexDirection: 'row-reverse', // RTL
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 6,
   },
@@ -680,7 +675,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   inputButton: {
-    flexDirection: 'row-reverse', // RTL
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: colors.background,
@@ -713,7 +708,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   amountInputWrapper: {
-    flexDirection: 'row-reverse', // RTL
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: colors.background,
     borderRadius: 8,
@@ -725,7 +720,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: colors.text,
-    marginRight: 8, // Changed from marginLeft for RTL
+    marginRight: 8,
   },
   amountTextInput: {
     flex: 1,
@@ -736,7 +731,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   modalButtons: {
-    flexDirection: 'row-reverse', // RTL
+    flexDirection: 'row-reverse',
     gap: 12,
     marginTop: 8,
   },

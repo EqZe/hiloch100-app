@@ -16,14 +16,9 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  interpolate,
 } from 'react-native-reanimated';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Href } from 'expo-router';
-
-// Force RTL for Android
-I18nManager.allowRTL(true);
-I18nManager.forceRTL(true);
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -97,14 +92,14 @@ export default function FloatingTabBar({
 
   const indicatorStyle = useAnimatedStyle(() => {
     const tabWidth = (containerWidth - 16) / tabs.length;
-    // For RTL with row-reverse, the visual position is reversed
-    // So we need to calculate position from right to left
-    const visualIndex = tabs.length - 1 - animatedValue.value;
+    // For RTL, position from right to left
+    // The indicator should move from right (index 0) to left (index n-1)
+    const translateX = animatedValue.value * tabWidth;
     
     return {
       transform: [
         {
-          translateX: visualIndex * tabWidth,
+          translateX: translateX,
         },
       ],
     };
