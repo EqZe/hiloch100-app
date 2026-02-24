@@ -84,6 +84,8 @@ export default function GamifiedCounter({
     return 'כמעט שם! עוד קצת';
   };
 
+  const motivationalText = getMotivationalText();
+
   const handleFlip = useCallback(() => {
     console.log('GamifiedCounter: Flip button pressed');
     if (rotation.value === 0) {
@@ -143,11 +145,14 @@ export default function GamifiedCounter({
 
   const circleSize = 280;
 
-  // Check if fully completed: 0 days left and both stages done
   const isFullyCompleted = currentRemaining === 0 && stage1Remaining === 0 && stage2Remaining === 0;
 
   const completionTitle = 'סיימת מלווה!';
   const completionSubtitle = 'תהנה עם הרישיון';
+
+  const stageTitle = getCurrentStageTitle();
+  const daysRemainingLabel = 'ימים נותרו';
+  const completedLabel = 'הושלם';
 
   return (
     <View style={styles.container}>
@@ -179,9 +184,9 @@ export default function GamifiedCounter({
                 <>
                   <Text style={styles.endDateText}>{endDate}</Text>
                   <Text style={styles.mainNumber}>{currentRemainingText}</Text>
-                  <Text style={styles.mainLabel}>ימים נותרו</Text>
+                  <Text style={styles.mainLabel}>{daysRemainingLabel}</Text>
                   <View style={styles.stageIndicator}>
-                    <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+                    <Text style={styles.stageText}>{stageTitle}</Text>
                   </View>
                 </>
               )}
@@ -217,9 +222,9 @@ export default function GamifiedCounter({
                 <>
                   <Text style={styles.endDateText}>{endDate}</Text>
                   <Text style={styles.mainNumber}>{percentageText}</Text>
-                  <Text style={styles.mainLabel}>הושלם</Text>
+                  <Text style={styles.mainLabel}>{completedLabel}</Text>
                   <View style={styles.stageIndicator}>
-                    <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
+                    <Text style={styles.stageText}>{stageTitle}</Text>
                   </View>
                 </>
               )}
@@ -232,14 +237,14 @@ export default function GamifiedCounter({
         <Text style={styles.nextStageNote}>{nextStageNoteText}</Text>
       )}
 
-      <Text style={styles.motivationalText}>{getMotivationalText()}</Text>
+      <Text style={styles.motivationalText}>{motivationalText}</Text>
 
       {currentStage !== 'completed' && (
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBarWrapper}>
             <View style={styles.progressBarBackground}>
               <View style={styles.progressBarNightSection} />
-              <View
+              <Animated.View
                 style={[
                   styles.progressBarFill,
                   {
@@ -400,7 +405,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
-    fontWeight: '900',
     ...Platform.select({
       ios: {
         shadowColor: '#4FC3F7',
@@ -413,7 +417,6 @@ const styles = StyleSheet.create({
       },
       web: {
         boxShadow: '0px 3px 12px rgba(79, 195, 247, 0.8)',
-        fontWeight: 'bold',
       },
     }),
   },

@@ -130,18 +130,31 @@ export default function CustomDatePicker({
 
           <View style={styles.pickerContainer}>
             <View style={styles.pickerColumn}>
-              <Text style={styles.columnLabel}>שנה</Text>
+              <Text style={styles.columnLabel}>יום</Text>
               <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-                {years.map((year) => {
-                  const isSelected = year === selectedYear;
+                {days.map((day) => {
+                  const isSelected = day === selectedDay;
+                  const isDisabled = isDateDisabled(selectedYear, selectedMonth, day);
+                  const dayText = String(day);
                   return (
                     <TouchableOpacity
-                      key={year}
-                      style={[styles.pickerItem, isSelected && styles.pickerItemSelected]}
-                      onPress={() => handleYearChange(year)}
+                      key={day}
+                      style={[
+                        styles.pickerItem,
+                        isSelected && styles.pickerItemSelected,
+                        isDisabled && styles.pickerItemDisabled,
+                      ]}
+                      onPress={() => !isDisabled && handleDayChange(day)}
+                      disabled={isDisabled}
                     >
-                      <Text style={[styles.pickerItemText, isSelected && styles.pickerItemTextSelected]}>
-                        {year}
+                      <Text
+                        style={[
+                          styles.pickerItemText,
+                          isSelected && styles.pickerItemTextSelected,
+                          isDisabled && styles.pickerItemTextDisabled,
+                        ]}
+                      >
+                        {dayText}
                       </Text>
                     </TouchableOpacity>
                   );
@@ -182,30 +195,19 @@ export default function CustomDatePicker({
             </View>
 
             <View style={styles.pickerColumn}>
-              <Text style={styles.columnLabel}>יום</Text>
+              <Text style={styles.columnLabel}>שנה</Text>
               <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-                {days.map((day) => {
-                  const isSelected = day === selectedDay;
-                  const isDisabled = isDateDisabled(selectedYear, selectedMonth, day);
+                {years.map((year) => {
+                  const isSelected = year === selectedYear;
+                  const yearText = String(year);
                   return (
                     <TouchableOpacity
-                      key={day}
-                      style={[
-                        styles.pickerItem,
-                        isSelected && styles.pickerItemSelected,
-                        isDisabled && styles.pickerItemDisabled,
-                      ]}
-                      onPress={() => !isDisabled && handleDayChange(day)}
-                      disabled={isDisabled}
+                      key={year}
+                      style={[styles.pickerItem, isSelected && styles.pickerItemSelected]}
+                      onPress={() => handleYearChange(year)}
                     >
-                      <Text
-                        style={[
-                          styles.pickerItemText,
-                          isSelected && styles.pickerItemTextSelected,
-                          isDisabled && styles.pickerItemTextDisabled,
-                        ]}
-                      >
-                        {day}
+                      <Text style={[styles.pickerItemText, isSelected && styles.pickerItemTextSelected]}>
+                        {yearText}
                       </Text>
                     </TouchableOpacity>
                   );
@@ -215,11 +217,11 @@ export default function CustomDatePicker({
           </View>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-              <Text style={styles.cancelButtonText}>ביטול</Text>
-            </TouchableOpacity>
             <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
               <Text style={styles.confirmButtonText}>אישור</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+              <Text style={styles.cancelButtonText}>ביטול</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
