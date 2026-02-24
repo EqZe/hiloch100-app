@@ -1,0 +1,810 @@
+
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Modal,
+  I18nManager,
+  TextInput,
+  Alert,
+} from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import { colors } from '@/styles/commonStyles';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { IconSymbol } from '@/components/IconSymbol';
+import CustomDatePicker from '@/components/CustomDatePicker';
+
+// Force RTL layout for Android
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
+
+const STORAGE_KEY = 'driving_expenses';
+
+// Expense types in Hebrew
+const EXPENSE_TYPES = [
+  'שיעור נהיגה',
+  'אגרת טסט',
+  'אגרת מבחן תיאוריה',
+  'תשלום למורה עבור טסט',
+  'אגרת רישום',
+  'שיעור נהיגה כפול',
+  'אגרה לאחר מעבר טסט',
+  'אגרת טסט פנימי',
+  'טופס ירוק',
+  'בדיקת ראייה',
+  'דמי החלפה',
+  'הילוך מאה - הכנה לטסט',
+  'קורס הכנה לתיאוריה',
+];
+
+interface Expense {
+  id: string;
+  type: string;
+  amount: number;
+  date: string;
+}
+
+export default function ExpensesScreen() {
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showTypeModal, setShowTypeModal] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(null);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  
+  // Form state
+  const [selectedType, setSelectedType] = useState<string>('');
+  const [amount, setAmount] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  // Load expenses on mount
+  useEffect(() => {
+    loadExpenses();
+  }, []);
+
+  const loadExpenses = async () => {
+    try {
+      console.log('Loading expenses from storage (Android)');
+      const stored = await SecureStore.getItemAsync(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setExpenses(parsed);
+        console.log('Loaded expenses (Android):', parsed.length);
+      }
+    } catch (error) {
+      console.error('Error loading expenses (Android):', error);
+    }
+  };
+
+  const saveExpenses = async (newExpenses: Expense[]) => {
+    try {
+      console.log('Saving expenses to storage (Android):', newExpenses.length);
+      await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(newExpenses));
+    } catch (error) {
+      console.error('Error saving expenses (Android):', error);
+    }
+  };
+
+  const handleAddExpense = useCallback(() => {
+    console.log('User tapped Add Expense button (Android)');
+    setEditingExpense(null);
+    setSelectedType('');
+    setAmount('');
+    setSelectedDate(new Date());
+    setShowAddModal(true);
+  }, []);
+
+  const handleEditExpense = useCallback((expense: Expense) => {
+    console.log('User tapped Edit for expense (Android):', expense.id);
+    setEditingExpense(expense);
+    setSelectedType(expense.type);
+    setAmount(expense.amount.toString());
+    setSelectedDate(new Date(expense.date));
+    setShowEditModal(true);
+  }, []);
+
+  const handleSelectType = useCallback((type: string) => {
+    console.log('User selected expense type (Android):', type);
+    setSelectedType(type);
+    setShowTypeModal(false);
+  }, []);
+
+  const handleOpenTypeModal = useCallback(() => {
+    console.log('Opening type selection modal (Android)');
+    setShowAddModal(false);
+    setShowEditModal(false);
+    setTimeout(() => {
+      setShowTypeModal(true);
+    }, 100);
+  }, []);
+
+  const handleCloseTypeModal = useCallback(() => {
+    console.log('Closing type selection modal (Android)');
+    setShowTypeModal(false);
+    setTimeout(() => {
+      if (editingExpense) {
+        setShowEditModal(true);
+      } else {
+        setShowAddModal(true);
+      }
+    }, 100);
+  }, [editingExpense]);
+
+  const handleOpenDatePicker = useCallback(() => {
+    console.log('Opening date picker (Android)');
+    setShowAddModal(false);
+    setShowEditModal(false);
+    setTimeout(() => {
+      setShowDatePicker(true);
+    }, 100);
+  }, []);
+
+  const handleCloseDatePicker = useCallback(() => {
+    console.log('Closing date picker (Android)');
+    setShowDatePicker(false);
+    setTimeout(() => {
+      if (editingExpense) {
+        setShowEditModal(true);
+      } else {
+        setShowAddModal(true);
+      }
+    }, 100);
+  }, [editingExpense]);
+
+  const handleSaveExpense = useCallback(() => {
+    console.log('Save button pressed (Android) - Type:', selectedType, 'Amount:', amount);
+    
+    if (!selectedType) {
+      console.log('Cannot save expense: missing type (Android)');
+      Alert.alert('שגיאה', 'אנא בחר סוג הוצאה');
+      return;
+    }
+    
+    if (!amount) {
+      console.log('Cannot save expense: missing amount (Android)');
+      Alert.alert('שגיאה', 'אנא הזן סכום');
+      return;
+    }
+
+    const numAmount = parseFloat(amount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      console.log('Cannot save expense: invalid amount (Android)');
+      Alert.alert('שגיאה', 'אנא הזן סכום תקין');
+      return;
+    }
+
+    if (editingExpense) {
+      console.log('Updating expense (Android):', editingExpense.id);
+      const updatedExpense: Expense = {
+        ...editingExpense,
+        type: selectedType,
+        amount: numAmount,
+        date: selectedDate.toISOString(),
+      };
+      const updatedExpenses = expenses.map(e => 
+        e.id === editingExpense.id ? updatedExpense : e
+      );
+      setExpenses(updatedExpenses);
+      saveExpenses(updatedExpenses);
+      setShowEditModal(false);
+      setEditingExpense(null);
+    } else {
+      const newExpense: Expense = {
+        id: Date.now().toString(),
+        type: selectedType,
+        amount: numAmount,
+        date: selectedDate.toISOString(),
+      };
+
+      console.log('Saving new expense (Android):', newExpense);
+      const updatedExpenses = [...expenses, newExpense];
+      setExpenses(updatedExpenses);
+      saveExpenses(updatedExpenses);
+      setShowAddModal(false);
+    }
+  }, [selectedType, amount, selectedDate, expenses, editingExpense]);
+
+  const handleDeleteExpense = useCallback((id: string) => {
+    console.log('User tapped delete for expense (Android):', id);
+    setSelectedExpenseId(id);
+    setShowDeleteModal(true);
+  }, []);
+
+  const confirmDelete = useCallback(() => {
+    if (!selectedExpenseId) return;
+    
+    console.log('Deleting expense (Android):', selectedExpenseId);
+    const updatedExpenses = expenses.filter(e => e.id !== selectedExpenseId);
+    setExpenses(updatedExpenses);
+    saveExpenses(updatedExpenses);
+    setShowDeleteModal(false);
+    setSelectedExpenseId(null);
+  }, [selectedExpenseId, expenses]);
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const formatAmount = (amount: number): string => {
+    return `₪${amount.toFixed(2)}`;
+  };
+
+  const getTotalAmount = (): number => {
+    return expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  };
+
+  const totalAmount = getTotalAmount();
+  const totalAmountText = formatAmount(totalAmount);
+
+  // Sort expenses by date (newest first)
+  const sortedExpenses = [...expenses].sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+
+  const isAddModalVisible = showAddModal;
+  const isEditModalVisible = showEditModal;
+  const isTypeModalVisible = showTypeModal;
+  const isDatePickerVisible = showDatePicker;
+  const isDeleteModalVisible = showDeleteModal;
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={handleAddExpense}
+          activeOpacity={0.7}
+        >
+          <IconSymbol
+            ios_icon_name="plus"
+            android_material_icon_name="add"
+            size={24}
+            color="#FFFFFF"
+          />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>מעקב הוצאות</Text>
+      </View>
+
+      <View style={styles.summaryCard}>
+        <Text style={styles.summaryLabel}>סך הכל הוצאות</Text>
+        <Text style={styles.summaryAmount}>{totalAmountText}</Text>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {sortedExpenses.length === 0 ? (
+          <View style={styles.emptyState}>
+            <IconSymbol
+              ios_icon_name="receipt"
+              android_material_icon_name="receipt"
+              size={64}
+              color={colors.grey}
+            />
+            <Text style={styles.emptyText}>אין הוצאות עדיין</Text>
+            <Text style={styles.emptySubtext}>לחץ על + להוספת הוצאה</Text>
+          </View>
+        ) : (
+          <React.Fragment>
+            {sortedExpenses.map((expense, index) => {
+              const expenseDate = formatDate(expense.date);
+              const expenseAmount = formatAmount(expense.amount);
+              
+              return (
+                <View key={index} style={styles.expenseCard}>
+                  <View style={styles.expenseHeader}>
+                    <View style={styles.expenseActions}>
+                      <TouchableOpacity
+                        onPress={() => handleDeleteExpense(expense.id)}
+                        activeOpacity={0.7}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        style={styles.actionButton}
+                      >
+                        <IconSymbol
+                          ios_icon_name="trash"
+                          android_material_icon_name="delete"
+                          size={20}
+                          color={colors.warning}
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => handleEditExpense(expense)}
+                        activeOpacity={0.7}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        style={styles.actionButton}
+                      >
+                        <IconSymbol
+                          ios_icon_name="pencil"
+                          android_material_icon_name="edit"
+                          size={20}
+                          color={colors.primary}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.expenseType}>{expense.type}</Text>
+                  </View>
+                  <View style={styles.expenseDetails}>
+                    <Text style={styles.expenseAmount}>{expenseAmount}</Text>
+                    <View style={styles.expenseDetailRow}>
+                      <Text style={styles.expenseDate}>{expenseDate}</Text>
+                      <IconSymbol
+                        ios_icon_name="calendar"
+                        android_material_icon_name="calendar-today"
+                        size={16}
+                        color={colors.textSecondary}
+                      />
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
+          </React.Fragment>
+        )}
+      </ScrollView>
+
+      {/* Add/Edit Expense Modal */}
+      <Modal
+        visible={isAddModalVisible || isEditModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => {
+          setShowAddModal(false);
+          setShowEditModal(false);
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              {editingExpense ? 'עריכת הוצאה' : 'הוספת הוצאה'}
+            </Text>
+
+            {/* Type Selection */}
+            <TouchableOpacity
+              style={styles.inputButton}
+              onPress={handleOpenTypeModal}
+              activeOpacity={0.7}
+            >
+              <IconSymbol
+                ios_icon_name="chevron.down"
+                android_material_icon_name="arrow-drop-down"
+                size={24}
+                color={colors.textSecondary}
+              />
+              <Text style={selectedType ? styles.inputButtonTextSelected : styles.inputButtonText}>
+                {selectedType || 'בחר סוג הוצאה'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Amount Input */}
+            <View style={styles.amountInputContainer}>
+              <Text style={styles.inputLabel}>סכום</Text>
+              <View style={styles.amountInputWrapper}>
+                <Text style={styles.currencySymbol}>₪</Text>
+                <TextInput
+                  style={styles.amountTextInput}
+                  value={amount}
+                  onChangeText={setAmount}
+                  placeholder="0.00"
+                  placeholderTextColor={colors.textSecondary}
+                  keyboardType="decimal-pad"
+                  returnKeyType="done"
+                  textAlign="right"
+                />
+              </View>
+            </View>
+
+            {/* Date Selection */}
+            <TouchableOpacity
+              style={styles.inputButton}
+              onPress={handleOpenDatePicker}
+              activeOpacity={0.7}
+            >
+              <IconSymbol
+                ios_icon_name="calendar"
+                android_material_icon_name="calendar-today"
+                size={24}
+                color={colors.textSecondary}
+              />
+              <Text style={styles.inputButtonTextSelected}>
+                {formatDate(selectedDate.toISOString())}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => {
+                  setShowAddModal(false);
+                  setShowEditModal(false);
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>ביטול</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={handleSaveExpense}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.saveButtonText}>שמור</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Type Selection Modal */}
+      <Modal
+        visible={isTypeModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={handleCloseTypeModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.typeModalContent}>
+            <Text style={styles.modalTitle}>בחר סוג הוצאה</Text>
+            <ScrollView style={styles.typeList} showsVerticalScrollIndicator={false}>
+              {EXPENSE_TYPES.map((type, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.typeItem}
+                  onPress={() => {
+                    handleSelectType(type);
+                    handleCloseTypeModal();
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.typeItemText}>{type}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.cancelButton, { marginTop: 16 }]}
+              onPress={handleCloseTypeModal}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.cancelButtonText}>ביטול</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Date Picker */}
+      <CustomDatePicker
+        visible={isDatePickerVisible}
+        onClose={handleCloseDatePicker}
+        onSelectDate={(date) => {
+          console.log('Date selected (Android):', date);
+          setSelectedDate(date);
+          handleCloseDatePicker();
+        }}
+        selectedDate={selectedDate}
+        maximumDate={new Date()}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        visible={isDeleteModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowDeleteModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.deleteModalContent}>
+            <Text style={styles.modalTitle}>מחיקת הוצאה</Text>
+            <Text style={styles.deleteModalText}>האם אתה בטוח שברצונך למחוק הוצאה זו?</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowDeleteModal(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>ביטול</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.deleteButton]}
+                onPress={confirmDelete}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.deleteButtonText}>מחק</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    paddingTop: 0,
+  },
+  header: {
+    flexDirection: 'row-reverse', // RTL
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: colors.card,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'right',
+  },
+  addButton: {
+    backgroundColor: colors.primary,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+  },
+  summaryCard: {
+    backgroundColor: colors.card,
+    marginHorizontal: 20,
+    marginTop: 16,
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+    elevation: 3,
+  },
+  summaryLabel: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  summaryAmount: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: colors.primary,
+    textAlign: 'center',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 100,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  expenseCard: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    elevation: 2,
+  },
+  expenseHeader: {
+    flexDirection: 'row-reverse', // RTL
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  expenseActions: {
+    flexDirection: 'row-reverse', // RTL
+    gap: 12,
+  },
+  actionButton: {
+    padding: 4,
+  },
+  expenseType: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    flex: 1,
+    textAlign: 'right',
+    marginLeft: 12, // Changed from marginRight for RTL
+  },
+  expenseDetails: {
+    flexDirection: 'row-reverse', // RTL
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  expenseDetailRow: {
+    flexDirection: 'row-reverse', // RTL
+    alignItems: 'center',
+    gap: 6,
+  },
+  expenseDate: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'right',
+  },
+  expenseAmount: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.primary,
+    textAlign: 'left',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    elevation: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  inputButton: {
+    flexDirection: 'row-reverse', // RTL
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  inputButtonText: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    textAlign: 'right',
+    flex: 1,
+  },
+  inputButtonTextSelected: {
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: '500',
+    textAlign: 'right',
+    flex: 1,
+  },
+  amountInputContainer: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 8,
+    textAlign: 'right',
+  },
+  amountInputWrapper: {
+    flexDirection: 'row-reverse', // RTL
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 16,
+  },
+  currencySymbol: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+    marginRight: 8, // Changed from marginLeft for RTL
+  },
+  amountTextInput: {
+    flex: 1,
+    paddingVertical: 16,
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: '500',
+    textAlign: 'right',
+  },
+  modalButtons: {
+    flexDirection: 'row-reverse', // RTL
+    gap: 12,
+    marginTop: 8,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: colors.backgroundAlt,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  saveButton: {
+    backgroundColor: colors.primary,
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  deleteButton: {
+    backgroundColor: colors.warning,
+  },
+  deleteButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  typeModalContent: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 24,
+    width: '90%',
+    maxWidth: 400,
+    maxHeight: '80%',
+    elevation: 10,
+  },
+  typeList: {
+    maxHeight: 400,
+  },
+  typeItem: {
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  typeItemText: {
+    fontSize: 16,
+    color: colors.text,
+    textAlign: 'right',
+  },
+  deleteModalContent: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    elevation: 8,
+  },
+  deleteModalText: {
+    fontSize: 16,
+    color: colors.text,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+});
