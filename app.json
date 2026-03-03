@@ -2,7 +2,7 @@
 {
   "expo": {
     "name": "הילוך מאה",
-    "slug": "hiloch100",
+    "slug": "hilouch-meah",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/אינסטגרם לוגו אוגוסט 2022.jpg",
@@ -33,6 +33,7 @@
       "bundler": "metro"
     },
     "plugins": [
+      "./plugins/withMaterial3Expressive",
       "expo-font",
       "expo-router",
       "expo-web-browser",
@@ -62,7 +63,7 @@
         }
       ]
     ],
-    "scheme": "hiloch100",
+    "scheme": "hilouch-meah",
     "experiments": {
       "typedRoutes": true
     },
