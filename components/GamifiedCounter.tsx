@@ -84,8 +84,6 @@ export default function GamifiedCounter({
     return 'כמעט שם! עוד קצת';
   };
 
-  const motivationalText = getMotivationalText();
-
   const handleFlip = useCallback(() => {
     console.log('GamifiedCounter: Flip button pressed');
     if (rotation.value === 0) {
@@ -145,14 +143,11 @@ export default function GamifiedCounter({
 
   const circleSize = 280;
 
+  // Check if fully completed: 0 days left and both stages done
   const isFullyCompleted = currentRemaining === 0 && stage1Remaining === 0 && stage2Remaining === 0;
 
   const completionTitle = 'סיימת מלווה!';
   const completionSubtitle = 'תהנה עם הרישיון';
-
-  const stageTitle = getCurrentStageTitle();
-  const daysRemainingLabel = 'ימים נותרו';
-  const completedLabel = 'הושלם';
 
   return (
     <View style={styles.container}>
@@ -184,9 +179,9 @@ export default function GamifiedCounter({
                 <>
                   <Text style={styles.endDateText}>{endDate}</Text>
                   <Text style={styles.mainNumber}>{currentRemainingText}</Text>
-                  <Text style={styles.mainLabel}>{daysRemainingLabel}</Text>
+                  <Text style={styles.mainLabel}>ימים נותרו</Text>
                   <View style={styles.stageIndicator}>
-                    <Text style={styles.stageText}>{stageTitle}</Text>
+                    <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
                   </View>
                 </>
               )}
@@ -222,9 +217,9 @@ export default function GamifiedCounter({
                 <>
                   <Text style={styles.endDateText}>{endDate}</Text>
                   <Text style={styles.mainNumber}>{percentageText}</Text>
-                  <Text style={styles.mainLabel}>{completedLabel}</Text>
+                  <Text style={styles.mainLabel}>הושלם</Text>
                   <View style={styles.stageIndicator}>
-                    <Text style={styles.stageText}>{stageTitle}</Text>
+                    <Text style={styles.stageText}>{getCurrentStageTitle()}</Text>
                   </View>
                 </>
               )}
@@ -237,14 +232,14 @@ export default function GamifiedCounter({
         <Text style={styles.nextStageNote}>{nextStageNoteText}</Text>
       )}
 
-      <Text style={styles.motivationalText}>{motivationalText}</Text>
+      <Text style={styles.motivationalText}>{getMotivationalText()}</Text>
 
       {currentStage !== 'completed' && (
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBarWrapper}>
             <View style={styles.progressBarBackground}>
               <View style={styles.progressBarNightSection} />
-              <Animated.View
+              <View
                 style={[
                   styles.progressBarFill,
                   {
@@ -311,21 +306,18 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: '600',
     marginBottom: 8,
-    textAlign: 'right',
   },
   mainNumber: {
     fontSize: 72,
     fontWeight: '900',
     color: colors.text,
     lineHeight: 80,
-    textAlign: 'right',
   },
   mainLabel: {
     fontSize: 16,
     color: colors.textSecondary,
     fontWeight: '600',
     marginTop: 4,
-    textAlign: 'right',
   },
   stageIndicator: {
     backgroundColor: '#4FC3F7',
@@ -338,7 +330,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
-    textAlign: 'right',
   },
   completionContainer: {
     alignItems: 'center',
@@ -349,20 +340,20 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '900',
     color: '#4CAF50',
-    textAlign: 'right',
+    textAlign: 'center',
     marginBottom: 12,
   },
   completionSubtitle: {
     fontSize: 20,
     fontWeight: '700',
     color: colors.text,
-    textAlign: 'right',
+    textAlign: 'center',
   },
   nextStageNote: {
     fontSize: 16,
     fontWeight: '600',
     color: colors.textSecondary,
-    textAlign: 'right',
+    textAlign: 'center',
     marginBottom: 10,
     paddingHorizontal: 20,
   },
@@ -370,7 +361,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,
-    textAlign: 'right',
+    textAlign: 'center',
     marginBottom: 30,
     paddingHorizontal: 20,
   },
@@ -402,9 +393,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#4FC3F7',
     borderRadius: 6,
     position: 'absolute',
-    right: 0,
+    left: 0,
     top: 0,
     bottom: 0,
+    fontWeight: '900',
     ...Platform.select({
       ios: {
         shadowColor: '#4FC3F7',
@@ -417,6 +409,7 @@ const styles = StyleSheet.create({
       },
       web: {
         boxShadow: '0px 3px 12px rgba(79, 195, 247, 0.8)',
+        fontWeight: 'bold',
       },
     }),
   },
@@ -424,6 +417,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: colors.textSecondary,
-    textAlign: 'right',
+    textAlign: 'center',
   },
 });

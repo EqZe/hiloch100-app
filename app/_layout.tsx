@@ -6,28 +6,24 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SystemBars } from "react-native-edge-to-edge";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useColorScheme, Alert, I18nManager } from "react-native";
 import { useNetworkState } from "expo-network";
-import { StatusBar } from "expo-status-bar";
-import "react-native-reanimated";
-import { useColorScheme, Alert, I18nManager, Platform } from "react-native";
 import {
   DarkTheme,
   DefaultTheme,
   Theme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 import { WidgetProvider } from "@/contexts/WidgetContext";
-
 // Note: Error logging is auto-initialized via index.ts import
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-// Force RTL layout for Android only
-if (Platform.OS === 'android') {
-  I18nManager.allowRTL(true);
-  I18nManager.forceRTL(true);
-}
+// Force RTL layout for Hebrew
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
 
 export const unstable_settings = {
   initialRouteName: "(tabs)", // Ensure any route can link back to `/`
