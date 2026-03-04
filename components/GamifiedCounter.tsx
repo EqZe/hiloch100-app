@@ -72,7 +72,7 @@ export default function GamifiedCounter({
     if (currentStage === 'completed') {
       return {
         line1: 'שמחים שעזרנו לך לעבור טסט!',
-        line2: 'הילוך מאה - מאות טיפים וכלי הכנה לטסט!',
+        line2: 'הילוך מאה - מאות טיפים לטסט',
       };
     }
     if (currentProgress < 25) {
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   motivationalTextContainer: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 30,
     paddingHorizontal: 20,
     width: '100%',
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,
-    textAlign: 'left',
+    textAlign: 'center',
     width: '100%',
   },
   progressBarContainer: {
