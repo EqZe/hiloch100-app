@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "Test Ready",
-    "slug": "Test Ready",
+    "name": "\u05d4\u05d9\u05dc\u05d5\u05da \u05de\u05d0\u05d4",
+    "slug": "hiloch100",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/natively-dark.png",
+    "icon": "./assets/images/\u05d0\u05d9\u05e0\u05e1\u05d8\u05d2\u05e8\u05dd \u05dc\u05d5\u05d2\u05d5 \u05d0\u05d5\u05d2\u05d5\u05e1\u05d8 2022.jpg",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/natively-dark.png",
+      "image": "./assets/images/\u05d0\u05d9\u05e0\u05e1\u05d8\u05d2\u05e8\u05dd \u05dc\u05d5\u05d2\u05d5 \u05d0\u05d5\u05d2\u05d5\u05e1\u05d8 2022.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
@@ -21,28 +21,51 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/natively-dark.png",
+        "foregroundImage": "./assets/images/\u05d0\u05d9\u05e0\u05e1\u05d8\u05d2\u05e8\u05dd \u05dc\u05d5\u05d2\u05d5 \u05d0\u05d5\u05d2\u05d5\u05e1\u05d8 2022.jpg",
         "backgroundColor": "#000000"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.Natively"
+      "package": "com.hilochmea.co.il",
+      "userInterfaceStyle": "automatic"
     },
     "web": {
       "favicon": "./assets/images/final_quest_240x240.png",
       "bundler": "metro"
     },
     "plugins": [
+      "./plugins/withMaterial3Expressive.js",
       "expo-font",
       "expo-router",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 34,
+            "minSdkVersion": 24,
+            "buildToolsVersion": "34.0.0",
+            "enableProguardInReleaseBuilds": false,
+            "enableShrinkResourcesInReleaseBuilds": false,
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      [
+        "react-native-edge-to-edge",
+        {
+          "android": {
+            "enforceNavigationBarContrast": false
+          }
+        }
+      ]
     ],
-    "scheme": "Test Ready",
+    "scheme": "app",
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
       "router": {},
-      "backendUrl": "https://7datzeqsphwat7qbdtnqy5cgsvrsv3wp.app.specular.dev"
+      "backendUrl": "https://pfcck5kpcrfsnvsa2ybwja2wjbjm4vp7.app.specular.dev"
     }
   }
 }
