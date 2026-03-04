@@ -1,14 +1,15 @@
+
 {
   "expo": {
-    "name": "\u05d4\u05d9\u05dc\u05d5\u05da \u05de\u05d0\u05d4",
-    "slug": "hiloch100",
+    "name": "הילוך מאה",
+    "slug": "hilouch-meah",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/\u05d0\u05d9\u05e0\u05e1\u05d8\u05d2\u05e8\u05dd \u05dc\u05d5\u05d2\u05d5 \u05d0\u05d5\u05d2\u05d5\u05e1\u05d8 2022.jpg",
+    "icon": "./assets/images/אינסטגרם לוגו אוגוסט 2022.jpg",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/\u05d0\u05d9\u05e0\u05e1\u05d8\u05d2\u05e8\u05dd \u05dc\u05d5\u05d2\u05d5 \u05d0\u05d5\u05d2\u05d5\u05e1\u05d8 2022.jpg",
+      "image": "./assets/images/אינסטגרם לוגו אוגוסט 2022.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
@@ -21,7 +22,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/\u05d0\u05d9\u05e0\u05e1\u05d8\u05d2\u05e8\u05dd \u05dc\u05d5\u05d2\u05d5 \u05d0\u05d5\u05d2\u05d5\u05e1\u05d8 2022.jpg",
+        "foregroundImage": "./assets/images/אינסטגרם לוגו אוגוסט 2022.jpg",
         "backgroundColor": "#000000"
       },
       "package": "com.hilochmea.co.il",
@@ -32,7 +33,7 @@
       "bundler": "metro"
     },
     "plugins": [
-      "./plugins/withMaterial3Expressive.js",
+      "./plugins/withMaterial3Expressive",
       "expo-font",
       "expo-router",
       "expo-web-browser",
@@ -46,7 +47,10 @@
             "buildToolsVersion": "34.0.0",
             "enableProguardInReleaseBuilds": false,
             "enableShrinkResourcesInReleaseBuilds": false,
-            "usesCleartextTraffic": true
+            "usesCleartextTraffic": true,
+            "manifestQueries": {
+              "package": []
+            }
           }
         }
       ],
@@ -59,7 +63,7 @@
         }
       ]
     ],
-    "scheme": "app",
+    "scheme": "hilouch-meah",
     "experiments": {
       "typedRoutes": true
     },
