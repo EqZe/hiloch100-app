@@ -365,10 +365,6 @@ export default function CounterScreen() {
                       isStage1Completed && styles.stageCardCompleted
                     ]}>
                       <View style={styles.stageHeader}>
-                        <View style={styles.stageTitleContainer}>
-                          <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
-                          <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
-                        </View>
                         <View style={styles.stageIconContainer}>
                           <IconSymbol
                             ios_icon_name="person.fill"
@@ -376,6 +372,10 @@ export default function CounterScreen() {
                             size={28}
                             color={calculatedDates.currentStage === 1 ? '#4FC3F7' : isStage1Completed ? '#4CAF50' : '#8E8E93'}
                           />
+                        </View>
+                        <View style={styles.stageTitleContainer}>
+                          <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
+                          <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
                         </View>
                       </View>
 
@@ -467,10 +467,6 @@ export default function CounterScreen() {
                       isStage2Completed && styles.stageCardCompleted
                     ]}>
                       <View style={styles.stageHeader}>
-                        <View style={styles.stageTitleContainer}>
-                          <Text style={styles.stageTitle}>שלב 2 - מלווה לילה</Text>
-                          <Text style={styles.stageSubtitle}>3 חודשים נוספים</Text>
-                        </View>
                         <View style={styles.stageIconContainer}>
                           <IconSymbol
                             ios_icon_name="moon.fill"
@@ -478,6 +474,10 @@ export default function CounterScreen() {
                             size={28}
                             color={calculatedDates.currentStage === 2 ? '#4FC3F7' : isStage2Completed ? '#4CAF50' : '#8E8E93'}
                           />
+                        </View>
+                        <View style={styles.stageTitleContainer}>
+                          <Text style={styles.stageTitle}>שלב 2 - מלווה לילה</Text>
+                          <Text style={styles.stageSubtitle}>3 חודשים נוספים</Text>
                         </View>
                       </View>
 
@@ -1272,20 +1272,20 @@ const styles = StyleSheet.create({
   },
   stageTitleContainer: {
     flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
   },
   stageTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: colors.text,
-    textAlign: 'right',
+    textAlign: 'left',
   },
   stageSubtitle: {
     fontSize: 14,
     color: colors.textSecondary,
     marginTop: 2,
     fontWeight: '500',
-    textAlign: 'right',
+    textAlign: 'left',
   },
   requirementBox: {
     backgroundColor: '#FFF9E6',
@@ -1317,8 +1317,10 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     borderRadius: 5,
-    right: 0,
     position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
   },
   progressText: {
     fontSize: 16,

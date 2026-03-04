@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4FC3F7',
     borderRadius: 6,
     position: 'absolute',
-    right: 0,
+    left: 0,
     top: 0,
     bottom: 0,
     ...Platform.select({
