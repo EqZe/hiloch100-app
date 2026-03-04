@@ -70,18 +70,33 @@ export default function GamifiedCounter({
 
   const getMotivationalText = () => {
     if (currentStage === 'completed') {
-      return 'שמחים שעזרנו לך לעבור טסט - הילוך מאה';
+      return {
+        line1: 'שמחים שעזרנו לך לעבור טסט!',
+        line2: 'הילוך מאה - מאות טיפים וכלי הכנה לטסט!',
+      };
     }
     if (currentProgress < 25) {
-      return 'התחלה מצוינת! המשך כך';
+      return {
+        line1: 'התחלה מצוינת! המשך כך',
+        line2: null,
+      };
     }
     if (currentProgress < 50) {
-      return 'אתה בדרך! המשך להתקדם';
+      return {
+        line1: 'אתה בדרך! המשך להתקדם',
+        line2: null,
+      };
     }
     if (currentProgress < 75) {
-      return 'יותר ממחצית הדרך! כל הכבוד';
+      return {
+        line1: 'יותר ממחצית הדרך! כל הכבוד',
+        line2: null,
+      };
     }
-    return 'כמעט שם! עוד קצת';
+    return {
+      line1: 'כמעט שם! עוד קצת',
+      line2: null,
+    };
   };
 
   const motivationalText = getMotivationalText();
@@ -237,7 +252,12 @@ export default function GamifiedCounter({
         <Text style={styles.nextStageNote}>{nextStageNoteText}</Text>
       )}
 
-      <Text style={styles.motivationalText}>{motivationalText}</Text>
+      <View style={styles.motivationalTextContainer}>
+        <Text style={styles.motivationalText}>{motivationalText.line1}</Text>
+        {motivationalText.line2 && (
+          <Text style={styles.motivationalText}>{motivationalText.line2}</Text>
+        )}
+      </View>
 
       {currentStage !== 'completed' && (
         <View style={styles.progressBarContainer}>
@@ -366,13 +386,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 20,
   },
+  motivationalTextContainer: {
+    alignItems: 'flex-start',
+    marginBottom: 30,
+    paddingHorizontal: 20,
+    width: '100%',
+  },
   motivationalText: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,
-    textAlign: 'right',
-    marginBottom: 30,
-    paddingHorizontal: 20,
+    textAlign: 'left',
+    width: '100%',
   },
   progressBarContainer: {
     width: '100%',
