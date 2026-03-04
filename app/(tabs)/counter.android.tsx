@@ -365,6 +365,10 @@ export default function CounterScreen() {
                       isStage1Completed && styles.stageCardCompleted
                     ]}>
                       <View style={styles.stageHeader}>
+                        <View style={styles.stageTitleContainer}>
+                          <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
+                          <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
+                        </View>
                         <View style={styles.stageIconContainer}>
                           <IconSymbol
                             ios_icon_name="person.fill"
@@ -372,10 +376,6 @@ export default function CounterScreen() {
                             size={28}
                             color={calculatedDates.currentStage === 1 ? '#4FC3F7' : isStage1Completed ? '#4CAF50' : '#8E8E93'}
                           />
-                        </View>
-                        <View style={styles.stageTitleContainer}>
-                          <Text style={styles.stageTitle}>שלב 1 - מלווה</Text>
-                          <Text style={styles.stageSubtitle}>3 חודשים ראשונים</Text>
                         </View>
                       </View>
 
@@ -467,6 +467,10 @@ export default function CounterScreen() {
                       isStage2Completed && styles.stageCardCompleted
                     ]}>
                       <View style={styles.stageHeader}>
+                        <View style={styles.stageTitleContainer}>
+                          <Text style={styles.stageTitle}>שלב 2 - מלווה לילה</Text>
+                          <Text style={styles.stageSubtitle}>3 חודשים נוספים</Text>
+                        </View>
                         <View style={styles.stageIconContainer}>
                           <IconSymbol
                             ios_icon_name="moon.fill"
@@ -474,10 +478,6 @@ export default function CounterScreen() {
                             size={28}
                             color={calculatedDates.currentStage === 2 ? '#4FC3F7' : isStage2Completed ? '#4CAF50' : '#8E8E93'}
                           />
-                        </View>
-                        <View style={styles.stageTitleContainer}>
-                          <Text style={styles.stageTitle}>שלב 2 - מלווה לילה</Text>
-                          <Text style={styles.stageSubtitle}>3 חודשים נוספים</Text>
                         </View>
                       </View>
 
@@ -581,6 +581,10 @@ export default function CounterScreen() {
                   )}
 
                   <View style={styles.totalHeader}>
+                    <View style={styles.totalTitleContainer}>
+                      <Text style={styles.totalTitle}>סה"כ תקופת המלווה</Text>
+                      <Text style={styles.totalSubtitle}>6 חודשים</Text>
+                    </View>
                     <View style={styles.totalIconContainer}>
                       <IconSymbol
                         ios_icon_name="calendar"
@@ -588,10 +592,6 @@ export default function CounterScreen() {
                         size={32}
                         color={isFullyCompleted ? '#4CAF50' : '#4FC3F7'}
                       />
-                    </View>
-                    <View style={styles.totalTitleContainer}>
-                      <Text style={styles.totalTitle}>סה"כ תקופת מלווה</Text>
-                      <Text style={styles.totalSubtitle}>6 חודשים</Text>
                     </View>
                   </View>
 
@@ -1042,6 +1042,10 @@ const styles = StyleSheet.create({
   totalProgressFill: {
     height: '100%',
     borderRadius: 7,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
   totalProgressText: {
     fontSize: 18,
@@ -1315,6 +1319,10 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     borderRadius: 5,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
   progressText: {
     fontSize: 16,
