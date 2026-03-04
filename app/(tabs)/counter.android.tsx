@@ -269,6 +269,10 @@ export default function CounterScreen() {
   const stage1ProgressText = `${Math.round(stage1Progress)}%`;
   const stage2ProgressText = `${Math.round(stage2Progress)}%`;
 
+  const motivationalLine1 = 'שמחים שעזרנו לך לעבור טסט!';
+  const motivationalLine2 = 'הילוך מאה - מאות טיפים לטסט';
+  const progressText = `${Math.round(totalProgress)}% מהליך הליווי הכולל הושלם`;
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView
@@ -559,11 +563,16 @@ export default function CounterScreen() {
                   </CircularProgress>
                 </View>
 
-                <Text style={styles.totalMotivationalText}>
-                  {isFullyCompleted 
-                    ? 'שמחים שעזרנו לך לעבור טסט - הילוך מאה'
-                    : `${Math.round(totalProgress)}% מהליך הליווי הכולל הושלם`}
-                </Text>
+                <View style={styles.motivationalTextContainer}>
+                  {isFullyCompleted ? (
+                    <>
+                      <Text style={styles.motivationalText}>{motivationalLine1}</Text>
+                      <Text style={styles.motivationalText}>{motivationalLine2}</Text>
+                    </>
+                  ) : (
+                    <Text style={styles.motivationalText}>{progressText}</Text>
+                  )}
+                </View>
 
                 <View style={[
                   styles.totalCard,
@@ -901,19 +910,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: 'right',
   },
-  totalStageIndicator: {
-    backgroundColor: '#4FC3F7',
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginTop: 12,
-  },
-  totalStageText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    textAlign: 'right',
-  },
   completionContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -932,13 +928,18 @@ const styles = StyleSheet.create({
     color: colors.text,
     textAlign: 'right',
   },
-  totalMotivationalText: {
+  motivationalTextContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+    paddingHorizontal: 20,
+    width: '100%',
+  },
+  motivationalText: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,
-    textAlign: 'right',
-    marginBottom: 30,
-    paddingHorizontal: 20,
+    textAlign: 'center',
+    width: '100%',
   },
   totalCard: {
     backgroundColor: colors.card,
