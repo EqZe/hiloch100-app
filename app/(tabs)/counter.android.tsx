@@ -581,10 +581,6 @@ export default function CounterScreen() {
                   )}
 
                   <View style={styles.totalHeader}>
-                    <View style={styles.totalTitleContainer}>
-                      <Text style={styles.totalTitle}>סה"כ תקופת מלווה</Text>
-                      <Text style={styles.totalSubtitle}>6 חודשים</Text>
-                    </View>
                     <View style={styles.totalIconContainer}>
                       <IconSymbol
                         ios_icon_name="calendar"
@@ -592,6 +588,10 @@ export default function CounterScreen() {
                         size={32}
                         color={isFullyCompleted ? '#4CAF50' : '#4FC3F7'}
                       />
+                    </View>
+                    <View style={styles.totalTitleContainer}>
+                      <Text style={styles.totalTitle}>סה"כ תקופת מלווה</Text>
+                      <Text style={styles.totalSubtitle}>6 חודשים</Text>
                     </View>
                   </View>
 
@@ -972,20 +972,20 @@ const styles = StyleSheet.create({
   },
   totalTitleContainer: {
     flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
   },
   totalTitle: {
     fontSize: 24,
     fontWeight: '800',
     color: colors.text,
-    textAlign: 'right',
+    textAlign: 'left',
   },
   totalSubtitle: {
     fontSize: 16,
     color: colors.textSecondary,
     marginTop: 4,
     fontWeight: '600',
-    textAlign: 'right',
+    textAlign: 'left',
   },
   totalIconContainer: {
     width: 64,
